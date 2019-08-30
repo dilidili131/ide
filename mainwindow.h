@@ -19,9 +19,13 @@ public:
 private:
     Ui::MainWindow *ui;
     QString fileName;
-    QString filePath;\
+    QString filePath;
     bool isSaved;
     bool isRunning;
+    bool Flag_isOpen = false;       //标记：判断是否打开或创建了一个文件
+    bool Flag_IsNew = false;        //标记：如果新建了文件就为1，初始值为0
+    QString Last_FileName;     //最后一次保存的文件的名字
+    QString Last_FileContent;  //最后一次保存文件的内容
 
     void initFileData();//初始化文件信息
 

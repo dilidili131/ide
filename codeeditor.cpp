@@ -2,6 +2,7 @@
 
 CodeEditor::CodeEditor( QWidget *parent):QPlainTextEdit (parent)
 {
-//qadAX
+    //qadAX
     //1212321
+    //1212
 }

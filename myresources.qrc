@@ -13,5 +13,6 @@
         <file>image/about.png</file>
         <file>image/Description.png</file>
         <file>image/run.png</file>
+        <file>image/saveas.png</file>
     </qresource>
 </RCC>

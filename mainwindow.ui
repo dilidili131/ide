@@ -50,6 +50,7 @@
     <addaction name="action_NewFile"/>
     <addaction name="action_Open"/>
     <addaction name="action_Save"/>
+    <addaction name="action_SaveAs"/>
    </widget>
    <widget class="QMenu" name="menu_2">
     <property name="title">
@@ -232,6 +233,18 @@
    </property>
    <property name="shortcut">
     <string>Shift+F5</string>
+   </property>
+  </action>
+  <action name="action_SaveAs">
+   <property name="icon">
+    <iconset resource="myresources.qrc">
+     <normaloff>:/myImages/image/saveas.png</normaloff>:/myImages/image/saveas.png</iconset>
+   </property>
+   <property name="text">
+    <string>另存为</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+S</string>
    </property>
   </action>
  </widget>

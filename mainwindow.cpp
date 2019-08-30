@@ -5,7 +5,9 @@
 #include <QMessageBox>
 #include <qtextstream.h>
 #include <QPlainTextEdit>
-
+//#include <QtDebug>
+//#include <iostream>
+//using namespace std;
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -19,6 +21,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->action_NewFile,SIGNAL(triggered(bool)),this,SLOT(newFile()));
     connect(ui->action_Open,SIGNAL(triggered(bool)),this,SLOT(openFile()));
     connect(ui->action_Save,SIGNAL(triggered(bool)),this,SLOT(saveFile()));
+    connect(ui->action_SaveAs,SIGNAL(triggered(bool)),this,SLOT(saveAsFile()));
 
     //---------------------------编辑部分----------------------------------
     connect(ui->action_Undo,SIGNAL(triggered(bool)),this,SLOT(undo()));
@@ -43,29 +46,38 @@ void MainWindow::initFileData()
     isRunning=false;
 }
 
-//新建文件
+//--------新建文件----------
+//1.新建主窗口对象
+//2.确定新窗口位置
+//3.新建窗口
+//---------LCH------------
 void MainWindow::newFile()
-{
-    //1.新建主窗口对象
-    //2.确定新窗口位置
-    //3.新建窗口
+{ 
     MainWindow *newWindow = new MainWindow;
     QRect newPosition = this->geometry();
     newWindow->setGeometry(newPosition.x()-10,newPosition.y()-10,newPosition.width(),newPosition.height());
     newWindow->show();
-    Flag_IsNew = true;
-    Flag_IsNew = true;
+    Flag_isNew = true;
+    Flag_isOpen = true;
 }
 
-//打开文件
+//-------------打开文件-------------------
+//打开文件逻辑：
+//首先获取文件名，判断文件名是否为空（是否直接关闭对话框）
+//在判断文件是否可读
+//如果没到文件末尾则一直读出到palintextedit中
+//Flag_isOpen = true;
+//Flag_isNew = false;
+//----------------LCH-------------------
 void MainWindow::openFile()
 {
-    fileName = QFileDialog::getOpenFileName(this,tr("Open File"),tr(""),tr("Text File(*.cpp)"));
-    if(fileName.isEmpty()){  //如果用户直接关闭对话框则文件名为空
+    //获取文件名,默认只能打开.cpp,.h,.c
+    QString filename = QFileDialog::getOpenFileName(this,tr("打开文件"),tr(""),tr("C++ source Files(*.cpp *.c *.h)"));
+    if(filename.isEmpty()){  //如果用户直接关闭对话框则文件名为空
         return ;
     }
     else{
-        QFile file(fileName);
+        QFile file(filename);
         if(!file.open(QIODevice::ReadOnly|QIODevice::Text)){
             QMessageBox::warning(this,tr("错误"),tr("打开文件失败"));
             return ;
@@ -77,27 +89,42 @@ void MainWindow::openFile()
             else{
                 QTextStream textStream(&file);//读取文件
                 while(!textStream.atEnd()){
-                   ui->plainTextEdit->setPlainText(textStream.readAll());
+                    ui->plainTextEdit->setPlainText(textStream.readAll());
                 }
                 ui->plainTextEdit->show();
                 file.close();
                 Flag_isOpen = true;
-                Last_FileName = fileName;
+                Flag_isNew = false;
+                Last_FileName = filename;
             }
         }
     }
 }
 
-//保存文件
+//----------保存文件------------
+//保存文件逻辑：
+//首先确定：
+//新建文件后Flag_isNew=true  Flag_isOpen=true
+//打开文件后Flag_isNew=false  Flag_isOpen=true
+//如果是新文件：
+//1.判断文件是否为空
+//2.获取保存文件名，防止不命名直接关闭
+//3.获取保存时的文件内容
+//-----------LCH---------------
+
 void MainWindow::saveFile()
 {
-    if(Flag_IsNew){//如果是新文件则弹出保存框
-        if(ui->plainTextEdit->toPlainText().isEmpty()){
+//    QString str = ui->plainTextEdit->toPlainText();
+//    qDebug()<<str;
+
+
+    if(Flag_isNew){//如果是新文件则弹出保存框
+        if(ui->plainTextEdit->toPlainText().isEmpty()){//文件不能为空
             QMessageBox::warning(this,tr("警告"),tr("内容不能为空!"),QMessageBox::Ok);
         }
         else{
             QFileDialog fileDialog;
-            QString f_name = fileDialog.getSaveFileName(this,tr("Open File"),"/home",tr("Cpp File(*.cpp)"));
+            QString f_name = fileDialog.getSaveFileName(this,tr("保存文件"),"/home",tr("C++ source Files(*.cpp *.c *.h)"));
             if(f_name.isEmpty())
                 return ;
             QFile filename(f_name);
@@ -113,7 +140,7 @@ void MainWindow::saveFile()
             }
             QMessageBox::information(this,"保存文件","保存文件成功",QMessageBox::Ok);
             filename.close();
-            Flag_IsNew = false;
+            Flag_isNew = false;
             Last_FileName = f_name;
         }
     }
@@ -134,10 +161,55 @@ void MainWindow::saveFile()
         }
         else{
             QMessageBox::warning(this,tr("警告"),tr("请先创建或者打开文件"));
-                return;
+            return;
         }
     }
 }
+//-------另存为------------
+//1.获取文件名
+//2.判断文件名是否为空
+//3.保存过程同上
+//--------LCH------------
+void MainWindow::saveAsFile()
+{
+    QFileDialog fileDialog;
+    QString filename = fileDialog.getSaveFileName(this,tr("保存文件"),"/home","C++ source Files(*.cpp *.c *.h)");
+    if(filename.isEmpty()){
+        return ;
+    }
+    QFile file(filename);
+    if(!file.open(QIODevice::WriteOnly|QIODevice::Text)){
+        QMessageBox::warning(this,tr("错误"),tr("保存文件失败"));
+        return;
+    }
+    else {
+        QTextStream textStream(&file);
+        QString str = ui->plainTextEdit->toPlainText();
+        textStream<<str;
+        QMessageBox::warning(this,tr("提示"),tr("保存文件成功"));
+        Last_FileContent=str;
+        Last_FileName = filename;
+        Flag_isNew = false;
+        file.close();
+    }
+}
+//保存提醒:有问题，不进入
+void MainWindow::saveWarn(QCloseEvent *event)
+{
+    //qDebug()<<ui->plainTextEdit->toPlainText();
+    if(ui->plainTextEdit->toPlainText() == Last_FileContent) //如果文本框的内容就是上次保存的文件内容，则接收信号，关闭
+        event->accept();
+    else                                            //否则弹出警告，有修改的内容未保存
+    {
+        if(QMessageBox::warning(this,tr("警告"),tr("文件还未保存,确定退出？"),QMessageBox::Yes|QMessageBox::No) == QMessageBox::Yes)
+        {
+            event->accept();
+        }
+        else
+            event->ignore();
+    }
+}
+
 
 //撤销
 void MainWindow::undo()
@@ -170,7 +242,5 @@ void MainWindow::paste()
 
 }
 
-void MainWindow::on_textEdit_destroyed()
-{
 
-}
+

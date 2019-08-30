@@ -2,5 +2,5 @@
 
 CodeEditor::CodeEditor( QWidget *parent):QPlainTextEdit (parent)
 {
-
+//qadAX
 }

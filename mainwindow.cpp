@@ -40,7 +40,7 @@ MainWindow::~MainWindow()
 //初始化文件信息
 void MainWindow::initFileData()
 {
-    fileName=tr("Untitled.cpp");
+    fileName=tr("Untitled");
     filePath=tr("~/Desktop/Untitled.cpp");
     isSaved=true;
     isRunning=false;
@@ -55,7 +55,7 @@ void MainWindow::newFile()
 { 
     MainWindow *newWindow = new MainWindow;
     QRect newPosition = this->geometry();
-    newWindow->setGeometry(newPosition.x()-10,newPosition.y()-10,newPosition.width(),newPosition.height());
+    newWindow->setGeometry(newPosition.x()+10,newPosition.y()+10,newPosition.width(),newPosition.height());
     newWindow->show();
     Flag_isNew = true;
     Flag_isOpen = true;
@@ -114,23 +114,20 @@ void MainWindow::openFile()
 
 void MainWindow::saveFile()
 {
-//    QString str = ui->plainTextEdit->toPlainText();
-//    qDebug()<<str;
-
-
-    if(Flag_isNew){//如果是新文件则弹出保存框
-        if(ui->plainTextEdit->toPlainText().isEmpty()){//文件不能为空
+    if(Flag_isNew){                  //如果新文件标记位为1，则弹出保存文件对话框
+        if(ui->plainTextEdit->toPlainText() == ""){
             QMessageBox::warning(this,tr("警告"),tr("内容不能为空!"),QMessageBox::Ok);
         }
         else{
             QFileDialog fileDialog;
-            QString f_name = fileDialog.getSaveFileName(this,tr("保存文件"),"/home",tr("C++ source Files(*.cpp *.c *.h)"));
-            if(f_name.isEmpty())
-                return ;
-            QFile filename(f_name);
-            if(!filename.open(QIODevice::WriteOnly)|QIODevice::Text){
-                QMessageBox::warning(this,tr("错误"),tr("保存文件失败"),QMessageBox::Ok);
-                return ;
+            QString str = fileDialog.getSaveFileName(this,tr("Open File"),"/home",tr("Text File(*.cpp *.c *.h)"));
+            if(str == ""){
+                return;
+            }
+            QFile filename(str);
+            if(!filename.open(QIODevice::WriteOnly | QIODevice::Text)){
+                QMessageBox::warning(this,tr("错误"),tr("打开文件失败"),QMessageBox::Ok);
+                return;
             }
             else{
                 QTextStream textStream(&filename);
@@ -141,13 +138,14 @@ void MainWindow::saveFile()
             QMessageBox::information(this,"保存文件","保存文件成功",QMessageBox::Ok);
             filename.close();
             Flag_isNew = false;
-            Last_FileName = f_name;
+            Flag_isOpen = true;//新文件标记位记为0
+            Last_FileName = str;//保存文件内容
         }
     }
-    else{
-        if(Flag_isOpen){
+    else{                        //否则，新文件标记位是0，代表是旧文件，默认直接保存覆盖源文件
+        if(Flag_isOpen){         //判断是否创建或打开了一个文件
             QFile file(Last_FileName);
-            if(!file.open(QIODevice::WriteOnly|QIODevice::Text)){
+            if(!file.open(QIODevice::WriteOnly | QIODevice::Text)){
                 QMessageBox::warning(this,tr("警告"),tr("打开文件失败"));
                 return;
             }
@@ -164,7 +162,9 @@ void MainWindow::saveFile()
             return;
         }
     }
+
 }
+
 //-------另存为------------
 //1.获取文件名
 //2.判断文件名是否为空
@@ -173,7 +173,7 @@ void MainWindow::saveFile()
 void MainWindow::saveAsFile()
 {
     QFileDialog fileDialog;
-    QString filename = fileDialog.getSaveFileName(this,tr("保存文件"),"/home","C++ source Files(*.cpp *.c *.h)");
+    QString filename = fileDialog.getSaveFileName(this,tr("选择保存路径与文件名"),"/home","C++ source Files(*.cpp *.c *.h)");
     if(filename.isEmpty()){
         return ;
     }
@@ -193,16 +193,16 @@ void MainWindow::saveAsFile()
         file.close();
     }
 }
-//保存提醒:有问题，不进入
+
+
+//BUG:保存提醒:有问题，不进入
 void MainWindow::saveWarn(QCloseEvent *event)
 {
     //qDebug()<<ui->plainTextEdit->toPlainText();
     if(ui->plainTextEdit->toPlainText() == Last_FileContent) //如果文本框的内容就是上次保存的文件内容，则接收信号，关闭
         event->accept();
-    else                                            //否则弹出警告，有修改的内容未保存
-    {
-        if(QMessageBox::warning(this,tr("警告"),tr("文件还未保存,确定退出？"),QMessageBox::Yes|QMessageBox::No) == QMessageBox::Yes)
-        {
+    else{                                           //否则弹出警告，有修改的内容未保存
+        if(QMessageBox::warning(this,tr("警告"),tr("文件还未保存,确定退出？"),QMessageBox::Yes|QMessageBox::No) == QMessageBox::Yes){
             event->accept();
         }
         else
@@ -214,32 +214,32 @@ void MainWindow::saveWarn(QCloseEvent *event)
 //撤销
 void MainWindow::undo()
 {
-
+    ui->plainTextEdit->undo();
 }
 //重做
 void MainWindow::redo()
 {
-
+    ui->plainTextEdit->redo();
 }
 //全选
 void MainWindow::allSelect()
 {
-
+    ui->plainTextEdit->selectAll();
 }
 //剪切
 void MainWindow::cut()
 {
-
+ ui->plainTextEdit->cut();
 }
 //复制
 void MainWindow::copy()
 {
-
+ ui->plainTextEdit->copy();
 }
 //粘贴
 void MainWindow::paste()
 {
-
+    ui->plainTextEdit->paste();
 }
 
 

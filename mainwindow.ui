@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>718</width>
-    <height>508</height>
+    <width>730</width>
+    <height>501</height>
    </rect>
   </property>
   <property name="cursor">
@@ -24,17 +24,7 @@
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout">
-    <item row="0" column="0">
-     <widget class="QPlainTextEdit" name="plainTextEdit">
-      <property name="minimumSize">
-       <size>
-        <width>700</width>
-        <height>300</height>
-       </size>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="0">
+    <item row="3" column="0">
      <widget class="QPlainTextEdit" name="plainTextEdit_2">
       <property name="minimumSize">
        <size>
@@ -50,6 +40,16 @@
       </property>
      </widget>
     </item>
+    <item row="2" column="0">
+     <widget class="QPlainTextEdit" name="plainTextEdit">
+      <property name="minimumSize">
+       <size>
+        <width>700</width>
+        <height>300</height>
+       </size>
+      </property>
+     </widget>
+    </item>
    </layout>
   </widget>
   <widget class="QMenuBar" name="menuBar">
@@ -57,7 +57,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>718</width>
+     <width>730</width>
      <height>22</height>
     </rect>
    </property>
@@ -93,6 +93,7 @@
      <string>调试(&amp;D)</string>
     </property>
     <addaction name="action_Run"/>
+    <addaction name="action_Run_2"/>
    </widget>
    <addaction name="menu"/>
    <addaction name="menu_2"/>
@@ -250,7 +251,7 @@
     <string>编译</string>
    </property>
    <property name="shortcut">
-    <string>Shift+F5</string>
+    <string>F9</string>
    </property>
   </action>
   <action name="action_SaveAs">
@@ -263,6 +264,18 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+Shift+S</string>
+   </property>
+  </action>
+  <action name="action_Run_2">
+   <property name="icon">
+    <iconset resource="myresources.qrc">
+     <normaloff>:/myImages/image/run.png</normaloff>:/myImages/image/run.png</iconset>
+   </property>
+   <property name="text">
+    <string>运行</string>
+   </property>
+   <property name="shortcut">
+    <string>F10</string>
    </property>
   </action>
  </widget>

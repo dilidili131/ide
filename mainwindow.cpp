@@ -40,9 +40,8 @@ MainWindow::~MainWindow()
 //初始化文件信息
 void MainWindow::initFileData()
 {
-    fileName=tr("Untitled");
-    filePath=tr("~/Desktop/Untitled.cpp");
-    isSaved=true;
+    fileName=tr("Untitled.cpp");
+    isSaved=false;
     isRunning=false;
 }
 
@@ -96,6 +95,11 @@ void MainWindow::openFile()
                 Flag_isOpen = true;
                 Flag_isNew = false;
                 Last_FileName = filename;
+
+                QRegularExpression re(tr("(?<=\\/)\\w+\\.cpp|(?<=\\/)\\w+\\.c|(?<=\\/)\\w+\\.h"));
+                fileName=re.match(filename).captured();
+                this->setWindowTitle(tr("IDE - ")+fileName);
+                isSaved=true;
             }
         }
     }
@@ -120,7 +124,7 @@ void MainWindow::saveFile()
         }
         else{
             QFileDialog fileDialog;
-            QString str = fileDialog.getSaveFileName(this,tr("Open File"),"/home",tr("Text File(*.cpp *.c *.h)"));
+            QString str = fileDialog.getSaveFileName(this,tr("Open File"),fileName,tr("Text File(*.cpp *.c *.h)"));
             if(str == ""){
                 return;
             }
@@ -137,6 +141,11 @@ void MainWindow::saveFile()
             }
             QMessageBox::information(this,"保存文件","保存文件成功",QMessageBox::Ok);
             filename.close();
+            isSaved = true;
+            QRegularExpression re(tr("(?<=\\/)\\w+\\.cpp|(?<=\\/)\\w+\\.c|(?<=\\/)\\w+\\.h"));
+            fileName=re.match(str).captured();
+            this->setWindowTitle(tr("IDE - ")+fileName);
+
             Flag_isNew = false;
             Flag_isOpen = true;//新文件标记位记为0
             Last_FileName = str;//保存文件内容
@@ -155,6 +164,7 @@ void MainWindow::saveFile()
                 textStream<<str;
                 Last_FileContent = str;
                 file.close();
+                isSaved = true;
             }
         }
         else{
@@ -173,7 +183,7 @@ void MainWindow::saveFile()
 void MainWindow::saveAsFile()
 {
     QFileDialog fileDialog;
-    QString filename = fileDialog.getSaveFileName(this,tr("选择保存路径与文件名"),"/home","C++ source Files(*.cpp *.c *.h)");
+    QString filename = fileDialog.getSaveFileName(this,tr("选择保存路径与文件名"),fileName,"C++ source Files(*.cpp *.c *.h)");
     if(filename.isEmpty()){
         return ;
     }
@@ -191,22 +201,20 @@ void MainWindow::saveAsFile()
         Last_FileName = filename;
         Flag_isNew = false;
         file.close();
+        isSaved = true;
+        QRegularExpression re(tr("(?<=\\/)\\w+\\.cpp|(?<=\\/)\\w+\\.c|(?<=\\/)\\w+\\.h"));
+        fileName=re.match(filename).captured();
+        this->setWindowTitle(tr("IDE - ")+fileName);
     }
 }
 
 
 //BUG:保存提醒:有问题，不进入
-void MainWindow::saveWarn(QCloseEvent *event)
-{
-    //qDebug()<<ui->plainTextEdit->toPlainText();
-    if(ui->plainTextEdit->toPlainText() == Last_FileContent) //如果文本框的内容就是上次保存的文件内容，则接收信号，关闭
-        event->accept();
-    else{                                           //否则弹出警告，有修改的内容未保存
-        if(QMessageBox::warning(this,tr("警告"),tr("文件还未保存,确定退出？"),QMessageBox::Yes|QMessageBox::No) == QMessageBox::Yes){
-            event->accept();
-        }
-        else
-            event->ignore();
+void MainWindow::saveWarn(QCloseEvent *event){
+  if(!isSaved){
+      if(QMessageBox::Save==QMessageBox::question(this,tr("未保存就要退出？"),tr("当前文件没有保存，是否保存？不保存文件改动将会丢失"),QMessageBox::Save,QMessageBox::Cancel))
+        saveFile();
+      isSaved=true;
     }
 }
 

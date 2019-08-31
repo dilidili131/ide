@@ -19,7 +19,6 @@ public:
 private:
     Ui::MainWindow *ui;
     QString fileName;
-    QString filePath;
     bool isSaved;
     bool isRunning;
     bool Flag_isOpen = false;       //标记：判断是否打开或创建了一个文件

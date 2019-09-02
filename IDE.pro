@@ -44,3 +44,11 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 RESOURCES += \
     myresources.qrc
 RC_FILE = my.rc
+INCLUDEPATH += C:\Users\LCH\Desktop\IDE_group\QScintilla_gpl-2.11.2\QScintilla_gpl-2.11.2\Qt4Qt5
+
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../IDE_group/QScintilla_gpl-2.11.2/QScintilla_gpl-2.11.2/Qt4Qt5/release/ -lqscintilla2_qt5
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../IDE_group/QScintilla_gpl-2.11.2/QScintilla_gpl-2.11.2/Qt4Qt5/debug/ -lqscintilla2_qt5
+else:unix: LIBS += -L$$PWD/../IDE_group/QScintilla_gpl-2.11.2/QScintilla_gpl-2.11.2/Qt4Qt5/ -lqscintilla2_qt5
+
+INCLUDEPATH += $$PWD/../IDE_group/QScintilla_gpl-2.11.2/QScintilla_gpl-2.11.2/Qt4Qt5/release
+DEPENDPATH += $$PWD/../IDE_group/QScintilla_gpl-2.11.2/QScintilla_gpl-2.11.2/Qt4Qt5/release

@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <qtextedit.h>
+#include "codeeditor.h"
 
 namespace Ui {
 class MainWindow;
@@ -18,6 +19,9 @@ public:
 
 private:
     Ui::MainWindow *ui;
+
+    CodeEditor *codeeditor = new CodeEditor(this);
+
     QString fileName;
     bool isSaved;
     bool isRunning;

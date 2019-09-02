@@ -1,3 +1,4 @@
+#include "codeeditor.h"
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QFileDialog>
@@ -5,9 +6,6 @@
 #include <QMessageBox>
 #include <qtextstream.h>
 #include <QPlainTextEdit>
-//#include <QtDebug>
-//#include <iostream>
-//using namespace std;
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -15,6 +13,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
 
     initFileData();
+    setCentralWidget(codeeditor);   //设主体为代码编辑器
 
     //信号与槽链接
     //---------------------------文件部分----------------------------------

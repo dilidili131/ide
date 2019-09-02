@@ -35,7 +35,7 @@ CodeEditor::CodeEditor(QWidget *parent)
 
     editor->setAutoCompletionSource(QsciScintilla::AcsAll);   //设置源，自动补全所有地方出现的
     editor->setAutoCompletionCaseSensitivity(true);   //设置自动补全大小写敏感
-    editor->setAutoCompletionThreshold(2);    //设置每输入2个字符就会出现自动补全的提示
+    editor->setAutoCompletionThreshold(1);    //设置每输入2个字符就会出现自动补全的提示
     //editor->setAutoCompletionReplaceWord(true);   //when an item from an auto-completion list is selected, the rest of the word to the right of the current cursor is removed.
 
 

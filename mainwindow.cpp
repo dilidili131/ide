@@ -6,6 +6,7 @@
 #include <QMessageBox>
 #include <qtextstream.h>
 #include <QPlainTextEdit>
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -87,9 +88,10 @@ void MainWindow::openFile()
             else{
                 QTextStream textStream(&file);//读取文件
                 while(!textStream.atEnd()){
-                    ui->plainTextEdit->setPlainText(textStream.readAll());
+                    codeeditor->geteditor()->setText(textStream.readAll());
+                    //codeeditor->geteditor()->setPlainText(textStream.readAll());
                 }
-                ui->plainTextEdit->show();
+                codeeditor->geteditor()->show();
                 file.close();
                 Flag_isOpen = true;
                 Flag_isNew = false;
@@ -118,7 +120,7 @@ void MainWindow::openFile()
 void MainWindow::saveFile()
 {
     if(Flag_isNew){                  //如果新文件标记位为1，则弹出保存文件对话框
-        if(ui->plainTextEdit->toPlainText() == ""){
+        if(codeeditor->geteditor()->text() == ""){
             QMessageBox::warning(this,tr("警告"),tr("内容不能为空!"),QMessageBox::Ok);
         }
         else{
@@ -134,7 +136,7 @@ void MainWindow::saveFile()
             }
             else{
                 QTextStream textStream(&filename);
-                QString str = ui->plainTextEdit->toPlainText();
+                QString str = codeeditor->geteditor()->text();
                 textStream<<str;
                 Last_FileContent = str;
             }
@@ -159,7 +161,7 @@ void MainWindow::saveFile()
             }
             else{
                 QTextStream textStream(&file);
-                QString str = ui->plainTextEdit->toPlainText();
+                QString str = codeeditor->geteditor()->text();
                 textStream<<str;
                 Last_FileContent = str;
                 file.close();
@@ -193,7 +195,7 @@ void MainWindow::saveAsFile()
     }
     else {
         QTextStream textStream(&file);
-        QString str = ui->plainTextEdit->toPlainText();
+        QString str = codeeditor->geteditor()->text();
         textStream<<str;
         QMessageBox::warning(this,tr("提示"),tr("保存文件成功"));
         Last_FileContent=str;
@@ -221,32 +223,32 @@ void MainWindow::saveWarn(QCloseEvent *event){
 //撤销
 void MainWindow::undo()
 {
-    ui->plainTextEdit->undo();
+    codeeditor->geteditor()->undo();
 }
 //重做
 void MainWindow::redo()
 {
-    ui->plainTextEdit->redo();
+    codeeditor->geteditor()->redo();
 }
 //全选
 void MainWindow::allSelect()
 {
-    ui->plainTextEdit->selectAll();
+    codeeditor->geteditor()->selectAll();
 }
 //剪切
 void MainWindow::cut()
 {
- ui->plainTextEdit->cut();
+ codeeditor->geteditor()->cut();
 }
 //复制
 void MainWindow::copy()
 {
- ui->plainTextEdit->copy();
+ codeeditor->geteditor()->copy();
 }
 //粘贴
 void MainWindow::paste()
 {
-    ui->plainTextEdit->paste();
+    codeeditor->geteditor()->paste();
 }
 
 

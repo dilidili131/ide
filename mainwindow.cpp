@@ -16,6 +16,8 @@ MainWindow::MainWindow(QWidget *parent) :
     initFileData();
     setCentralWidget(codeeditor);   //设主体为代码编辑器
 
+    isChanged = false;
+
     //信号与槽链接
     //---------------------------文件部分----------------------------------
     connect(ui->action_NewFile,SIGNAL(triggered(bool)),this,SLOT(newFile()));
@@ -34,6 +36,7 @@ MainWindow::MainWindow(QWidget *parent) :
     //---------------------------编译部分-----------------------------------
     connect(ui->action_Run,SIGNAL(triggered(bool)),this,SLOT(comp()));
     connect(ui->action_Run_2,SIGNAL(triggered(bool)),this,SLOT(run()));
+    connect(ui->plainTextEdit,SIGNAL(textChanged()),this,SLOT(on_changed()));//当文本内容发生变化时，触发on_changed函数
 }
 
 MainWindow::~MainWindow()
@@ -62,6 +65,7 @@ void MainWindow::newFile()
     newWindow->show();
     Flag_isNew = true;
     Flag_isOpen = true;
+    isChanged = false;
 }
 
 //-------------打开文件-------------------
@@ -105,6 +109,7 @@ void MainWindow::openFile()
                 fileName=re.match(filename).captured();
                 this->setWindowTitle(tr("IDE - ")+fileName);
                 isSaved=true;
+                isChanged = false;
             }
         }
     }
@@ -207,6 +212,7 @@ void MainWindow::saveAsFile()
         Flag_isNew = false;
         file.close();
         isSaved = true;
+        isChanged = false;
         QRegularExpression re(tr("(?<=\\/)\\w+\\.cpp|(?<=\\/)\\w+\\.c|(?<=\\/)\\w+\\.h"));
         fileName=re.match(filename).captured();
         this->setWindowTitle(tr("IDE - ")+fileName);
@@ -254,8 +260,12 @@ void MainWindow::paste()
 {
     codeeditor->geteditor()->paste();
 }
+void MainWindow::onChanged()
+{
+    isChanged = true;
+}
+//编译部分有个bug，把文件放到build-IDE文件夹里才能编译
 
-//编译部分有个bug，比如把文件放到build-IDE文件夹里才能编译
 void MainWindow::precomp()//预编译
 {
     FILE *p = fopen(fileName.toStdString().data(),"r");
@@ -270,7 +280,6 @@ void MainWindow::precomp()//预编译
         fgets(buf,sizeof(buf),p);
         str += buf;
     }
-
     fputs(str.toStdString().data(),p1);
     fclose(p);
     fclose(p1);
@@ -278,24 +287,20 @@ void MainWindow::precomp()//预编译
 //编译并运行按钮
 void MainWindow::comp()
 {
-    if (!isSaved)//在点击编译按钮，如果文本内容发生变化，就自动保存
-    {
-        saveFile();
-    }
+    saveFile();
     precomp();//自动以预编译
     QString cmd;
     const char *s = fileName.toStdString().data();
-    cmd.sprintf("gcc -o %s.exe %s.c",s,s);
+    cmd.sprintf("gcc -pedantic -o %s.exe %s.c",s,s);
     system(cmd.toStdString().data());//先编译
 
-    //如何删除那个临时文件呢
     cmd = fileName.replace("/","\\") + ".c";
     remove(cmd.toStdString().data());
-
 
     cmd = fileName + ".exe";
     system(cmd.toStdString().data());//再运行
 
+    //remove(cmd.toStdString().data());
 }
 
 void MainWindow::run()
@@ -306,6 +311,5 @@ void MainWindow::run()
 
     remove(cmd.toStdString().data());
 }
-
 
 

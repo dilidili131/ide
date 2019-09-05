@@ -25,6 +25,7 @@ private:
     QString fileName;
     bool isSaved;
     bool isRunning;
+    bool isChanged;
     bool Flag_isOpen = false;       //标记：判断是否打开或创建了一个文件
     bool Flag_isNew = true;        //教训：初始为true，次应用而为C语言ide，打开不用判断文件是否新建，可直接写代码
     QString Last_FileName;     //最后一次保存的文件的名字
@@ -53,6 +54,7 @@ public slots:
     //---------编译部分----------
     void comp();
     void run();
+    void onChanged();
 
 
 private slots:

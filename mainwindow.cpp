@@ -30,6 +30,10 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->action_Cut,SIGNAL(triggered(bool)),this,SLOT(cut()));
     connect(ui->action_Copy,SIGNAL(triggered(bool)),this,SLOT(copy()));
     connect(ui->action_Paste,SIGNAL(triggered(bool)),this,SLOT(paste()));
+
+    //---------------------------编译部分-----------------------------------
+    connect(ui->action_Run,SIGNAL(triggered(bool)),this,SLOT(comp()));
+    connect(ui->action_Run_2,SIGNAL(triggered(bool)),this,SLOT(run()));
 }
 
 MainWindow::~MainWindow()
@@ -249,6 +253,58 @@ void MainWindow::copy()
 void MainWindow::paste()
 {
     codeeditor->geteditor()->paste();
+}
+
+//编译部分有个bug，比如把文件放到build-IDE文件夹里才能编译
+void MainWindow::precomp()//预编译
+{
+    FILE *p = fopen(fileName.toStdString().data(),"r");
+    if(p == NULL) return ;
+    QString cmd = fileName +".c";
+    FILE *p1 = fopen(cmd.toStdString().data(),"w");
+    if(p1 == NULL) return ;
+    QString str;
+    while(!feof(p))
+    {
+        char buf[1024] = {0};
+        fgets(buf,sizeof(buf),p);
+        str += buf;
+    }
+
+    fputs(str.toStdString().data(),p1);
+    fclose(p);
+    fclose(p1);
+}
+//编译并运行按钮
+void MainWindow::comp()
+{
+    if (!isSaved)//在点击编译按钮，如果文本内容发生变化，就自动保存
+    {
+        saveFile();
+    }
+    precomp();//自动以预编译
+    QString cmd;
+    const char *s = fileName.toStdString().data();
+    cmd.sprintf("gcc -o %s.exe %s.c",s,s);
+    system(cmd.toStdString().data());//先编译
+
+    //如何删除那个临时文件呢
+    cmd = fileName.replace("/","\\") + ".c";
+    remove(cmd.toStdString().data());
+
+
+    cmd = fileName + ".exe";
+    system(cmd.toStdString().data());//再运行
+
+}
+
+void MainWindow::run()
+{
+    QString cmd;
+    cmd = fileName + ".exe";
+    system(cmd.toStdString().data());
+
+    remove(cmd.toStdString().data());
 }
 
 

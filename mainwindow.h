@@ -31,6 +31,7 @@ private:
     QString Last_FileContent;  //最后一次保存文件的内容
 
     void initFileData();//初始化文件信息
+    void precomp();//预编译
 
 //槽函数链接
 public slots:
@@ -48,6 +49,10 @@ public slots:
     void cut();        //剪切
     void copy();       //复制
     void paste();      //粘贴
+
+    //---------编译部分----------
+    void comp();
+    void run();
 
 
 private slots:

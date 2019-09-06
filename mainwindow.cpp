@@ -14,6 +14,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
 
     initFileData();
+    //TODO 调出控制台
     setCentralWidget(codeeditor);   //设主体为代码编辑器
 
     isChanged = false;

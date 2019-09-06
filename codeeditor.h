@@ -17,8 +17,13 @@ public:
     QsciScintilla *geteditor(){ //返回QScintilla的对象指针
         return editor;
     }
+    QsciScintilla *getconsole(){ //返回QScintilla的对象指针
+        return console;
+    }
+
 private:
     QsciScintilla *editor=new QsciScintilla(this);
+    QsciScintilla *console=new QsciScintilla(this);
 
 signals:
 

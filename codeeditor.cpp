@@ -1,8 +1,6 @@
 #include "codeeditor.h"
 #include "codeeditor.h"
-
 #include <Qsci/qsciapis.h>
-
 #include <QVBoxLayout>
 CodeEditor::CodeEditor(QWidget *parent)
     : QWidget(parent)
@@ -16,7 +14,10 @@ CodeEditor::CodeEditor(QWidget *parent)
     //界面
     QVBoxLayout *pLayout = new QVBoxLayout(this);
     pLayout->addWidget(editor);
+    pLayout->addWidget(console);
     pLayout->setContentsMargins(0,0,0,0);
+    pLayout->setStretchFactor(editor,4);
+    pLayout->setStretchFactor(console,1);
 
     //设置显示字体
     editor->setFont(QFont("Courier 10 Pitch"));
@@ -58,6 +59,14 @@ CodeEditor::CodeEditor(QWidget *parent)
     //括号匹配
     editor->setBraceMatching(QsciScintilla::SloppyBraceMatch);
 
+    //TODO 查找替换
+
+    //TODO 括号补全
+
+    //TODO 代码折叠
+
+
+    //TODO 注释
 }
 
 

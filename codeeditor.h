@@ -1,8 +1,6 @@
 #ifndef CODEEDITOR_H
 #define CODEEDITOR_H
 
-#include "highlighter.h"
-
 #include <QWidget>
 #include <Qsci/qsciscintilla.h>
 #include <Qsci/qscilexercpp.h>

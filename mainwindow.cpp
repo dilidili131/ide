@@ -326,7 +326,7 @@ void MainWindow::comp()
     precomp();//自动以预编译
     QString cmd;
     const char *s = fileName.toStdString().data();
-    cmd.sprintf("gcc -pedantic -o %s.exe %s.c",s,s);
+    cmd.sprintf("gcc -o %s.exe %s.c 2> err.txt",s,s);
     system(cmd.toStdString().data());//先编译
 
     cmd = fileName.replace("/","\\") + ".c";

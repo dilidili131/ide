@@ -88,6 +88,11 @@ CodeEditor::CodeEditor(QWidget *parent)
 
 
     //TODO 代码折叠
+    editor->setMarginType(3,QsciScintilla::SymbolMargin);
+    editor->setMarginLineNumbers(3,false);
+    editor->setMarginWidth(3,15);
+    editor->setMarginSensitivity(3,true);
+    editor->setFolding(QsciScintilla::BoxedTreeFoldStyle,3);
 
 
 }

@@ -92,8 +92,9 @@ void MainWindow::newFile()
 void MainWindow::openFile()
 {
     qDebug()<<"打开文件";
-    //获取文件名,默认只能打开.cpp,.h,.c
+    //获取文件路径,默认只能打开.cpp,.h,.c
     QString filename = QFileDialog::getOpenFileName(this,tr("打开文件"),tr(""),tr("C++ source Files(*.cpp *.c *.h)"));
+    qDebug()<<filename;
     if(filename.isEmpty()){  //如果用户直接关闭对话框则文件名为空
         return ;
     }
@@ -354,20 +355,20 @@ void MainWindow::comp()
     remove(cmd.toStdString().data());
 
     FILE *f = fopen("err.txt","r");
-    if(f==NULL)
+    QString str="";
+    while(!feof(f))
     {
-        cmd = fileName + ".exe";
-        system(cmd.toStdString().data());//再运行
+        char buf[1024] = {0};
+        fgets(buf,sizeof(buf),f);
+        str += buf;
+    }
+    if(str=="")
+    {
+        codeeditor->getconsole()->setText("编译成功");
     }
     else
     {
-        QString str;
-        while(!feof(f))
-        {
-            char buf[1024] = {0};
-            fgets(buf,sizeof(buf),f);
-            str += buf;
-        }
+
         codeeditor->getconsole()->setText(str);
         //codeeditor->getconsole()->text(str);
     }
@@ -386,7 +387,7 @@ void MainWindow::removeSubTab(int index)//关闭分页
 {
     saveFile();
     qDebug("kkk");
-    codeeditor->tabWidget->removeTab(index);
+    codeeditor->tabWidget->removeTab(index-1);
 }
 
 

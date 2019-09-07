@@ -20,7 +20,9 @@ public:
 private:
     Ui::MainWindow *ui;
 
-    CodeEditor *codeeditor = new CodeEditor(this);
+
+    //CodeEditor *codeeditor;
+    CodeEditor *codeeditor =  new CodeEditor(this);
 
     QString fileName;
     bool isSaved;

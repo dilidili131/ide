@@ -20,7 +20,7 @@ public:
     QsciScintilla *geteditor(){ //返回QScintilla的对象指针
         return editor;
     }
-    QPlainTextEdit *getconsole(){ //返回QScintilla的对象指针
+    QsciScintilla *getconsole(){ //返回QScintilla的对象指针
         return console;
     }
     QTabWidget *tabWidget;
@@ -28,7 +28,7 @@ public:
 private:
 
     QsciScintilla *editor=new QsciScintilla(this);
-    QPlainTextEdit *console = new QPlainTextEdit(this);
+    QsciScintilla *console = new QsciScintilla(this);
     //QsciScintilla *console=new QsciScintilla(this);
 
 signals:

@@ -6,6 +6,7 @@
 #include <QMessageBox>
 #include <qtextstream.h>
 #include <QPlainTextEdit>
+#include <QDebug>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -32,6 +33,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->action_Cut,SIGNAL(triggered(bool)),this,SLOT(cut()));
     connect(ui->action_Copy,SIGNAL(triggered(bool)),this,SLOT(copy()));
     connect(ui->action_Paste,SIGNAL(triggered(bool)),this,SLOT(paste()));
+    connect(ui->action_zhushi,SIGNAL(triggered(bool)),this,SLOT(Comment()));
 
     //---------------------------编译部分-----------------------------------
     connect(ui->action_Run,SIGNAL(triggered(bool)),this,SLOT(comp()));
@@ -54,20 +56,7 @@ void MainWindow::initFileData()
     isSaved=false;
     isRunning=false;
 }
-//void MainWindow::addNewtab()
-//{
-//    QWidget *widget = new QWidget();
-//    QVBoxLayout *v = new QVBoxLayout();
-//    CodeEditor c;
-//    v->addWidget(c.geteditor());
-//    v->addWidget(c.getconsole());
-//    v->setContentsMargins(0,0,0,0);
-//    v->setStretchFactor(c.geteditor(), 4);
-//    v->setStretchFactor(c.getconsole(), 1);
-//    widget->setLayout(v);
 
-//    codeeditor->tabWidget->addTab(widget,"untitled.cpp");
-//}
 //--------新建文件----------
 //1.新建主窗口对象
 //2.确定新窗口位置
@@ -75,19 +64,15 @@ void MainWindow::initFileData()
 //---------LCH------------
 void MainWindow::newFile()
 {
-//    MainWindow *newWindow = new MainWindow;
-//    QRect newPosition = this->geometry();
-//    newWindow->setGeometry(newPosition.x()+10,newPosition.y()+10,newPosition.width(),newPosition.height());
-//    newWindow->show();
-    //addNewtab();
+    qDebug()<<"新建";
     QWidget *widget = new QWidget();
     QVBoxLayout *v = new QVBoxLayout();
-    //CodeEditor c;
-    v->addWidget(codeeditor->geteditor());
-    v->addWidget(codeeditor->getconsole());
+    CodeEditor c;
+    v->addWidget(c.geteditor());
+    v->addWidget(c.getconsole());
     v->setContentsMargins(0,0,0,0);
-    v->setStretchFactor(codeeditor->geteditor(), 4);
-    v->setStretchFactor(codeeditor->getconsole(), 1);
+    v->setStretchFactor(c.geteditor(), 4);
+    v->setStretchFactor(c.getconsole(), 1);
     widget->setLayout(v);
 
     codeeditor->tabWidget->addTab(widget,"untitled.cpp");
@@ -106,6 +91,7 @@ void MainWindow::newFile()
 //----------------LCH-------------------
 void MainWindow::openFile()
 {
+    qDebug()<<"打开文件";
     //获取文件名,默认只能打开.cpp,.h,.c
     QString filename = QFileDialog::getOpenFileName(this,tr("打开文件"),tr(""),tr("C++ source Files(*.cpp *.c *.h)"));
     if(filename.isEmpty()){  //如果用户直接关闭对话框则文件名为空
@@ -158,6 +144,7 @@ void MainWindow::openFile()
 
 void MainWindow::saveFile()
 {
+    qDebug()<<"保存";
     if(Flag_isNew){                  //如果新文件标记位为1，则弹出保存文件对话框
         if(codeeditor->geteditor()->text() == ""){
             QMessageBox::warning(this,tr("警告"),tr("内容不能为空!"),QMessageBox::Ok);
@@ -223,6 +210,7 @@ void MainWindow::saveFile()
 //--------LCH------------
 void MainWindow::saveAsFile()
 {
+    qDebug()<<"另存为";
     QFileDialog fileDialog;
     QString filename = fileDialog.getSaveFileName(this,tr("选择保存路径与文件名"),fileName,"C++ source Files(*.cpp *.c *.h)");
     if(filename.isEmpty()){
@@ -252,16 +240,49 @@ void MainWindow::saveAsFile()
     }
 }
 
-
 //BUG:保存提醒:有问题，不进入
 void MainWindow::saveWarn(QCloseEvent *event){
-  if(!isSaved){
-      if(QMessageBox::Save==QMessageBox::question(this,tr("未保存就要退出？"),tr("当前文件没有保存，是否保存？不保存文件改动将会丢失"),QMessageBox::Save,QMessageBox::Cancel))
-        saveFile();
-      isSaved=true;
+    if(!isSaved){
+        if(QMessageBox::Save==QMessageBox::question(this,tr("未保存就要退出？"),tr("当前文件没有保存，是否保存？不保存文件改动将会丢失"),QMessageBox::Save,QMessageBox::Cancel))
+            saveFile();
+        isSaved=true;
     }
 }
 
+//多行注释
+void MainWindow::Comment()
+{
+    qDebug()<<"注释";
+    codeeditor->geteditor()->getSelection(&from,&start,&to,&end);
+    qDebug()<<from<<"+"<<to<<"+"<<start<<"+"<<end<<endl;
+    if(from>to){
+        temp=from;
+        from=to;
+        to=temp;
+    }
+    int flag = 1;
+    for(i=from;i<=to;i++){
+        if(codeeditor->geteditor()->wordAtLineIndex(i,0)!=""){
+            flag=0;
+            break;
+        }
+    }
+    qDebug()<<"flag="<<flag;
+    if(!flag){
+        for(int i=from;i<=to;i++){
+            codeeditor->geteditor()->insertAt(tr("//"),i,0);
+        }
+    }
+    else {
+        for(int i=from;i<=to;i++){
+            codeeditor->geteditor()->setSelection(i,0,i,2);
+            codeeditor->geteditor()->removeSelectedText();
+        }
+    }
+
+
+
+}
 
 //撤销
 void MainWindow::undo()
@@ -281,12 +302,12 @@ void MainWindow::allSelect()
 //剪切
 void MainWindow::cut()
 {
- codeeditor->geteditor()->cut();
+    codeeditor->geteditor()->cut();
 }
 //复制
 void MainWindow::copy()
 {
- codeeditor->geteditor()->copy();
+    codeeditor->geteditor()->copy();
 }
 //粘贴
 void MainWindow::paste()
@@ -297,7 +318,7 @@ void MainWindow::onChanged()
 {
     isChanged = true;
 }
-//编译部分有个bug，把文件放到build-IDE文件夹里才能编译
+//BUG 编译部分有个bug，把文件放到build-IDE文件夹里才能编译
 
 void MainWindow::precomp()//预编译
 {
@@ -367,5 +388,6 @@ void MainWindow::removeSubTab(int index)//关闭分页
     qDebug("kkk");
     codeeditor->tabWidget->removeTab(index);
 }
+
 
 

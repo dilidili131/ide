@@ -90,8 +90,6 @@ CodeEditor::CodeEditor(QWidget *parent)
     //TODO 代码折叠
 
 
-    //TODO 注释
-
 }
 //括号补全
 void CodeEditor::keyPressEvent(QKeyEvent *event)

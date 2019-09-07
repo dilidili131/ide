@@ -33,6 +33,13 @@ private:
 
     void initFileData();//初始化文件信息
     void precomp();//预编译
+    //注释
+    int from;
+    int to;
+    int i;
+    int temp;
+    int start;
+    int end;
 
     //槽函数链接
 public slots:
@@ -56,6 +63,8 @@ public slots:
     void run();
     void onChanged();
     void removeSubTab(int index);
+    //-------注释--------------
+    void Comment(); //注释
 
 
 private slots:

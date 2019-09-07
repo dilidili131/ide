@@ -80,6 +80,7 @@
     <addaction name="action_Cut"/>
     <addaction name="action_Copy"/>
     <addaction name="action_Paste"/>
+    <addaction name="action_zhushi"/>
    </widget>
    <widget class="QMenu" name="menu_3">
     <property name="title">
@@ -276,6 +277,14 @@
    </property>
    <property name="shortcut">
     <string>F10</string>
+   </property>
+  </action>
+  <action name="action_zhushi">
+   <property name="text">
+    <string>注释</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+/</string>
    </property>
   </action>
  </widget>

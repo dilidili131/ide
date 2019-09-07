@@ -298,10 +298,23 @@ void MainWindow::comp()
     cmd = fileName.replace("/","\\") + ".c";
     remove(cmd.toStdString().data());
 
-    cmd = fileName + ".exe";
-    system(cmd.toStdString().data());//再运行
-
-    //remove(cmd.toStdString().data());
+    FILE *f = fopen("err.txt","r");
+    if(f==NULL)
+    {
+        cmd = fileName + ".exe";
+        system(cmd.toStdString().data());//再运行
+    }
+    else
+    {
+        QString str;
+        while(!feof(f))
+        {
+            char buf[1024] = {0};
+            fgets(buf,sizeof(buf),f);
+            str += buf;
+        }
+        codeeditor->getconsole()->setText(str);
+    }
 }
 
 void MainWindow::run()

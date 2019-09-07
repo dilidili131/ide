@@ -42,7 +42,8 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 RESOURCES += \
-    myresources.qrc
+    myresources.qrc \
+    api.qrc
 RC_FILE = my.rc
 INCLUDEPATH += C:\Users\LCH\Desktop\IDE_group\QScintilla_gpl-2.11.2\QScintilla_gpl-2.11.2\Qt4Qt5
 
@@ -52,3 +53,5 @@ else:unix: LIBS += -L$$PWD/../IDE_group/QScintilla_gpl-2.11.2/QScintilla_gpl-2.1
 
 INCLUDEPATH += $$PWD/../IDE_group/QScintilla_gpl-2.11.2/QScintilla_gpl-2.11.2/Qt4Qt5/release
 DEPENDPATH += $$PWD/../IDE_group/QScintilla_gpl-2.11.2/QScintilla_gpl-2.11.2/Qt4Qt5/release
+
+DISTFILES +=

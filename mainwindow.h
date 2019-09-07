@@ -34,7 +34,7 @@ private:
     void initFileData();//初始化文件信息
     void precomp();//预编译
 
-//槽函数链接
+    //槽函数链接
 public slots:
     //----------文件部分---------
     void newFile();    //新建文件
@@ -55,6 +55,7 @@ public slots:
     void comp();
     void run();
     void onChanged();
+    void removeSubTab(int index);
 
 
 private slots:

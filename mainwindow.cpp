@@ -14,7 +14,6 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
 
     initFileData();
-    //TODO 调出控制台
     setCentralWidget(codeeditor);   //设主体为代码编辑器
 
     isChanged = false;
@@ -38,6 +37,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->action_Run,SIGNAL(triggered(bool)),this,SLOT(comp()));
     connect(ui->action_Run_2,SIGNAL(triggered(bool)),this,SLOT(run()));
     connect(ui->plainTextEdit,SIGNAL(textChanged()),this,SLOT(on_changed()));//当文本内容发生变化时，触发on_changed函数
+
+    //关闭分页
+    connect(codeeditor->tabWidget,SIGNAL(tabCloseRequested(int)),this,SLOT(removeSubTab(int)));
 }
 
 MainWindow::~MainWindow()
@@ -52,18 +54,43 @@ void MainWindow::initFileData()
     isSaved=false;
     isRunning=false;
 }
+//void MainWindow::addNewtab()
+//{
+//    QWidget *widget = new QWidget();
+//    QVBoxLayout *v = new QVBoxLayout();
+//    CodeEditor c;
+//    v->addWidget(c.geteditor());
+//    v->addWidget(c.getconsole());
+//    v->setContentsMargins(0,0,0,0);
+//    v->setStretchFactor(c.geteditor(), 4);
+//    v->setStretchFactor(c.getconsole(), 1);
+//    widget->setLayout(v);
 
+//    codeeditor->tabWidget->addTab(widget,"untitled.cpp");
+//}
 //--------新建文件----------
 //1.新建主窗口对象
 //2.确定新窗口位置
 //3.新建窗口
 //---------LCH------------
 void MainWindow::newFile()
-{ 
-    MainWindow *newWindow = new MainWindow;
-    QRect newPosition = this->geometry();
-    newWindow->setGeometry(newPosition.x()+10,newPosition.y()+10,newPosition.width(),newPosition.height());
-    newWindow->show();
+{
+//    MainWindow *newWindow = new MainWindow;
+//    QRect newPosition = this->geometry();
+//    newWindow->setGeometry(newPosition.x()+10,newPosition.y()+10,newPosition.width(),newPosition.height());
+//    newWindow->show();
+    //addNewtab();
+    QWidget *widget = new QWidget();
+    QVBoxLayout *v = new QVBoxLayout();
+    //CodeEditor c;
+    v->addWidget(codeeditor->geteditor());
+    v->addWidget(codeeditor->getconsole());
+    v->setContentsMargins(0,0,0,0);
+    v->setStretchFactor(codeeditor->geteditor(), 4);
+    v->setStretchFactor(codeeditor->getconsole(), 1);
+    widget->setLayout(v);
+
+    codeeditor->tabWidget->addTab(widget,"untitled.cpp");
     Flag_isNew = true;
     Flag_isOpen = true;
     isChanged = false;
@@ -108,7 +135,9 @@ void MainWindow::openFile()
 
                 QRegularExpression re(tr("(?<=\\/)\\w+\\.cpp|(?<=\\/)\\w+\\.c|(?<=\\/)\\w+\\.h"));
                 fileName=re.match(filename).captured();
-                this->setWindowTitle(tr("IDE - ")+fileName);
+                //this->setWindowTitle(tr("IDE - ")+fileName);
+                int index = codeeditor->tabWidget->currentIndex();
+                codeeditor->tabWidget->setTabText(index,fileName);
                 isSaved=true;
                 isChanged = false;
             }
@@ -155,8 +184,9 @@ void MainWindow::saveFile()
             isSaved = true;
             QRegularExpression re(tr("(?<=\\/)\\w+\\.cpp|(?<=\\/)\\w+\\.c|(?<=\\/)\\w+\\.h"));
             fileName=re.match(str).captured();
-            this->setWindowTitle(tr("IDE - ")+fileName);
-
+            //this->setWindowTitle(tr("IDE - ")+fileName);
+            int index = codeeditor->tabWidget->currentIndex();
+            codeeditor->tabWidget->setTabText(index,fileName);
             Flag_isNew = false;
             Flag_isOpen = true;//新文件标记位记为0
             Last_FileName = str;//保存文件内容
@@ -216,7 +246,9 @@ void MainWindow::saveAsFile()
         isChanged = false;
         QRegularExpression re(tr("(?<=\\/)\\w+\\.cpp|(?<=\\/)\\w+\\.c|(?<=\\/)\\w+\\.h"));
         fileName=re.match(filename).captured();
-        this->setWindowTitle(tr("IDE - ")+fileName);
+        //this->setWindowTitle(tr("IDE - ")+fileName);
+        int index = codeeditor->tabWidget->currentIndex();
+        codeeditor->tabWidget->setTabText(index,fileName);
     }
 }
 
@@ -285,6 +317,8 @@ void MainWindow::precomp()//预编译
     fclose(p);
     fclose(p1);
 }
+
+
 //编译并运行按钮
 void MainWindow::comp()
 {
@@ -311,6 +345,13 @@ void MainWindow::run()
     system(cmd.toStdString().data());
 
     remove(cmd.toStdString().data());
+}
+
+void MainWindow::removeSubTab(int index)//关闭分页
+{
+    saveFile();
+    qDebug("kkk");
+    codeeditor->tabWidget->removeTab(index);
 }
 
 

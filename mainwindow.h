@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <qtextedit.h>
 #include "codeeditor.h"
+#include "find.h"
 
 namespace Ui {
 class MainWindow;
@@ -39,6 +40,7 @@ private:
     int temp;
     int start;
     int end;
+    Find find;
 
     //槽函数链接
 public slots:
@@ -55,6 +57,10 @@ public slots:
     void cut();        //剪切
     void copy();       //复制
     void paste();      //粘贴
+    void showReplace();//替换
+    void showFind();   //查找
+    void pushFindLetter(QString, bool, bool);
+    void pushReplaceSelect(QString, QString, bool, bool, bool);
 
     //---------编译部分----------
     void comp();

@@ -58,7 +58,7 @@
      <x>0</x>
      <y>0</y>
      <width>730</width>
-     <height>26</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu">
@@ -81,6 +81,8 @@
     <addaction name="action_Copy"/>
     <addaction name="action_Paste"/>
     <addaction name="action_zhushi"/>
+    <addaction name="action_Find"/>
+    <addaction name="action_Replace"/>
    </widget>
    <widget class="QMenu" name="menu_3">
     <property name="title">
@@ -115,6 +117,9 @@
    <addaction name="action_Undo"/>
    <addaction name="action_Redo"/>
    <addaction name="action_Run"/>
+   <addaction name="action_Run_2"/>
+   <addaction name="action_Find"/>
+   <addaction name="action_Replace"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="action_NewFile">
@@ -246,7 +251,7 @@
   <action name="action_Run">
    <property name="icon">
     <iconset resource="myresources.qrc">
-     <normaloff>:/myImages/image/run.png</normaloff>:/myImages/image/run.png</iconset>
+     <normaloff>:/myImages/image/bianyi.png</normaloff>:/myImages/image/bianyi.png</iconset>
    </property>
    <property name="text">
     <string>编译</string>
@@ -280,11 +285,39 @@
    </property>
   </action>
   <action name="action_zhushi">
+   <property name="icon">
+    <iconset resource="myresources.qrc">
+     <normaloff>:/myImages/image/commit.png</normaloff>:/myImages/image/commit.png</iconset>
+   </property>
    <property name="text">
-    <string>注释</string>
+    <string>注释(&amp;K)</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+/</string>
+    <string>Ctrl+K</string>
+   </property>
+  </action>
+  <action name="action_Find">
+   <property name="icon">
+    <iconset resource="myresources.qrc">
+     <normaloff>:/myImages/image/find.png</normaloff>:/myImages/image/find.png</iconset>
+   </property>
+   <property name="text">
+    <string>查找(&amp;F)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+F</string>
+   </property>
+  </action>
+  <action name="action_Replace">
+   <property name="icon">
+    <iconset resource="myresources.qrc">
+     <normaloff>:/myImages/image/replace.png</normaloff>:/myImages/image/replace.png</iconset>
+   </property>
+   <property name="text">
+    <string>替换(&amp;R)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+R</string>
    </property>
   </action>
  </widget>

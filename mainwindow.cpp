@@ -32,6 +32,13 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->action_Copy,SIGNAL(triggered(bool)),this,SLOT(copy()));
     connect(ui->action_Paste,SIGNAL(triggered(bool)),this,SLOT(paste()));
     connect(ui->action_zhushi,SIGNAL(triggered(bool)),this,SLOT(Comment()));
+    connect(ui->action_Find,SIGNAL(triggered(bool)),this,SLOT(showFind()));
+    connect(ui->action_Replace,SIGNAL(triggered(bool)),this,SLOT(showReplace()));
+
+    connect(&find,SIGNAL(findLetter(QString,bool,bool)),this,SLOT(pushFindLetter(QString,bool,bool)));
+    //connect(&find,SIGNAL(findLetter(QString,bool,bool)),this,SLOT(pushFindLetter(QString,bool,bool)));
+    connect(&find,SIGNAL(replaceSelect(QString,QString,bool,bool,bool)),this,SLOT(pushReplaceSelect(QString,QString,bool,bool,bool)));
+
 
     //---------------------------编译部分-----------------------------------
     connect(ui->action_Run,SIGNAL(triggered(bool)),this,SLOT(comp()));
@@ -40,6 +47,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     //关闭分页
     connect(codeeditor->tabWidget,SIGNAL(tabCloseRequested(int)),this,SLOT(removeSubTab(int)));
+    //this->grabKeyboard();
 }
 
 MainWindow::~MainWindow()
@@ -59,7 +67,7 @@ void MainWindow::initFileData()
 //1.新建主窗口对象
 //2.确定新窗口位置
 //3.新建窗口
-//---------LCH------------
+//---------LCH+YSY------------
 void MainWindow::newFile()
 {
     qDebug()<<"新建";
@@ -207,7 +215,12 @@ void MainWindow::saveAsFile()
 void MainWindow::Comment()
 {
     qDebug()<<"注释";
-    codeeditor->geteditor()->getSelection(&from,&start,&to,&end);
+
+    QWidget *widget = codeeditor->tabWidget->currentWidget();
+    QList<QsciScintilla*> c = widget->findChildren<QsciScintilla *>();
+    QsciScintilla *e = c.at(0);
+
+    e->getSelection(&from,&start,&to,&end);
     qDebug()<<from<<"+"<<to<<"+"<<start<<"+"<<end<<endl;
     if(from>to){
         temp=from;
@@ -216,7 +229,7 @@ void MainWindow::Comment()
     }
     int flag = 1;
     for(i=from;i<=to;i++){
-        if(codeeditor->geteditor()->wordAtLineIndex(i,0)!=""){
+        if(e->wordAtLineIndex(i,0)!=""){
             flag=0;
             break;
         }
@@ -224,13 +237,13 @@ void MainWindow::Comment()
     qDebug()<<"flag="<<flag;
     if(!flag){
         for(int i=from;i<=to;i++){
-            codeeditor->geteditor()->insertAt(tr("//"),i,0);
+            e->insertAt(tr("//"),i,0);
         }
     }
     else {
         for(int i=from;i<=to;i++){
-            codeeditor->geteditor()->setSelection(i,0,i,2);
-            codeeditor->geteditor()->removeSelectedText();
+            e->setSelection(i,0,i,2);
+            e->removeSelectedText();
         }
     }
 }
@@ -264,6 +277,66 @@ void MainWindow::copy()
 void MainWindow::paste()
 {
     codeeditor->geteditor()->paste();
+}
+//替换
+void MainWindow::showReplace()
+{
+    //this->releaseKeyboard();
+    qDebug()<<"替换界面出现";
+    find.show();
+}
+//查找
+void MainWindow::showFind()
+{
+    //this->releaseKeyboard();
+    qDebug()<<"查找界面出现";
+    find.show();
+}
+
+void MainWindow::pushFindLetter(QString letter, bool match, bool forward)
+{
+    qDebug()<<"letter="<<letter;
+    QWidget *widget = codeeditor->tabWidget->currentWidget();
+    QList<QsciScintilla*> c = widget->findChildren<QsciScintilla *>();
+    QsciScintilla *e = c.at(0);
+
+    if(!e->findFirst(letter,false,match,false,true,forward)){
+        QMessageBox msg(NULL);
+        msg.setWindowTitle("Find");
+        msg.setText("Can not find \""+letter+"\"");
+        msg.setIcon(QMessageBox::Information);
+        msg.setStandardButtons(QMessageBox::Ok);
+
+        msg.setWindowFlags(Qt::WindowStaysOnBottomHint);
+        msg.exec();
+    }
+}
+
+void MainWindow::pushReplaceSelect(QString letter, QString replaceTo, bool match, bool forward, bool replaceall)
+{
+    qDebug()<<"letter="<<letter;
+    qDebug()<<"replaceto="<<replaceTo;
+    QWidget *widget = codeeditor->tabWidget->currentWidget();
+    QList<QsciScintilla*> c = widget->findChildren<QsciScintilla *>();
+    QsciScintilla *e = c.at(0);
+    if(!e->hasSelectedText())
+        pushFindLetter(letter,match,forward);
+
+    if(!replaceall){
+        e->replace(replaceTo);
+        pushFindLetter(letter,match,forward);
+    }
+    else{
+        while(e->findFirst(letter,false,match,false,true,forward))
+            e->replace(replaceTo);
+        QMessageBox msg(NULL);
+        msg.setWindowTitle("Replace");
+        msg.setText("Finished");
+        msg.setIcon(QMessageBox::Information);
+        msg.setStandardButtons(QMessageBox::Ok);
+        msg.setWindowFlags(Qt::WindowStaysOnTopHint);
+        msg.exec();
+    }
 }
 //BUG 编译部分有个bug，把文件放到build-IDE文件夹里才能编译
 

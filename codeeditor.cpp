@@ -82,17 +82,12 @@ CodeEditor::CodeEditor(QWidget *parent)
     editor->setBraceMatching(QsciScintilla::SloppyBraceMatch);
     //this->grabKeyboard();
 
-
-    //TODO 查找替换
-
-    //TODO 代码折叠
+    //代码折叠
     editor->setMarginType(3,QsciScintilla::SymbolMargin);
     editor->setMarginLineNumbers(3,false);
     editor->setMarginWidth(3,15);
     editor->setMarginSensitivity(3,true);
     editor->setFolding(QsciScintilla::BoxedTreeFoldStyle,3);
-
-
 }
 //括号补全
 //void CodeEditor::keyPressEvent(QKeyEvent *event)

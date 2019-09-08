@@ -14,5 +14,9 @@
         <file>image/Description.png</file>
         <file>image/run.png</file>
         <file>image/saveas.png</file>
+        <file>image/commit.png</file>
+        <file>image/find.png</file>
+        <file>image/replace.png</file>
+        <file>image/bianyi.png</file>
     </qresource>
 </RCC>

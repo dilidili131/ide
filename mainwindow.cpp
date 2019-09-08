@@ -153,7 +153,10 @@ void MainWindow::saveFile(bool flag)
         FILE *p = fopen(File[index].toStdString().data(),"w");
         if(p==NULL)
             return ;
-        QString str = codeeditor->geteditor()->text();
+        QWidget *widget = codeeditor->tabWidget->currentWidget();
+        QList<QsciScintilla*> c = widget->findChildren<QsciScintilla *>();
+        QsciScintilla *e = c.at(0);
+        QString str = e->text();
         fputs(str.toStdString().data(),p);
         if(flag == false)
         {

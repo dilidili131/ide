@@ -508,8 +508,7 @@ void MainWindow::about()
 //说明文档
 void MainWindow::description()
 {
-    QString strDoc = ":/buquan/help.pdf";
-    QDesktopServices::openUrl(QUrl::fromLocalFile(strDoc));
+   QDesktopServices::openUrl(QUrl("https://blog.csdn.net/qq_40619550/article/details/90760116"));
 }
 //括号补全 XJY
 bool MainWindow::eventFilter(QObject *obj, QEvent *event)

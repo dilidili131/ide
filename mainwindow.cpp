@@ -80,6 +80,30 @@ void MainWindow::newFile()
 void MainWindow::openFile()
 {
     //重写的打开文件
+    QString path = QFileDialog::getOpenFileName(this,tr("打开文件"),".",tr("C++ source Files(*.cpp *.c *.h)"));
+    if(!path.isEmpty())
+    {
+        QFile file(path);
+        if(!file.open(QIODevice::ReadOnly|QIODevice::Text)){
+            QMessageBox::warning(this,tr("错误"),tr("打开文件失败"));
+            return ;
+        }
+
+        int index = codeeditor->tabWidget->currentIndex();
+        QRegularExpression re(tr("(?<=\\/)\\w+\\.cpp|(?<=\\/)\\w+\\.c|(?<=\\/)\\w+\\.h"));
+        File[index] = re.match(path).captured();
+        QTextStream in(&file);
+        QWidget *widget = codeeditor->tabWidget->currentWidget();
+        QList<QsciScintilla*> c = widget->findChildren<QsciScintilla *>();
+        QsciScintilla *e = c.at(0);
+        e->setText(in.readAll());
+        file.close();
+        codeeditor->tabWidget->setTabText(index,File[index]);
+    }
+    else
+    {
+        return ;
+    }
 }
 
 //----------保存文件------------
@@ -146,30 +170,33 @@ void MainWindow::saveFile(bool flag)
 //--------LCH------------
 void MainWindow::saveAsFile()
 {
-    qDebug()<<"另存为";
-    QFileDialog fileDialog;
-    QString filename = fileDialog.getSaveFileName(this,tr("选择保存路径与文件名"),fileName,"C++ source Files(*.cpp *.c *.h)");
-    if(filename.isEmpty()){
-        return ;
-    }
-    QFile file(filename);
-    if(!file.open(QIODevice::WriteOnly|QIODevice::Text)){
-        QMessageBox::warning(this,tr("错误"),tr("保存文件失败"));
-        return;
-    }
-    else {
-        QTextStream textStream(&file);
-        QString str = codeeditor->geteditor()->text();
-        textStream<<str;
-        QMessageBox::warning(this,tr("提示"),tr("保存文件成功"));
-        Flag_isNew = false;
-        file.close();
-        isSaved = true;
+    int index = codeeditor->tabWidget->currentIndex();
+    QString path = QFileDialog::getSaveFileName(this,tr("Open File"),fileName,tr("C++ Source File(*.cpp *.c *.h)"));
+    if(!path.isEmpty())//选择好了路径
+    {
+        QFile file(path);
+        if(!file.open(QIODevice::WriteOnly | QIODevice::Text))
+        {
+            QMessageBox::information(this,"保存文件",tr("保存文件失败!"));
+            return ;
+        }
+
+        QMessageBox::information(this,"另存为",tr("另存为文件成功!"));
         QRegularExpression re(tr("(?<=\\/)\\w+\\.cpp|(?<=\\/)\\w+\\.c|(?<=\\/)\\w+\\.h"));
-        fileName=re.match(filename).captured();
-        //this->setWindowTitle(tr("IDE - ")+fileName);
-        int index = codeeditor->tabWidget->currentIndex();
-        codeeditor->tabWidget->setTabText(index,fileName);
+        File[index] = re.match(path).captured();
+        QTextStream out(&file);
+        QWidget *widget = codeeditor->tabWidget->currentWidget();
+        QList<QsciScintilla*> c = widget->findChildren<QsciScintilla *>();
+        QsciScintilla *e = c.at(0);
+        QString str = e->text();
+        qDebug()<<str;
+        out<<str;
+        file.close();
+        codeeditor->tabWidget->setTabText(index,File[index]);
+    }
+    else
+    {
+        return ;
     }
 }
 

@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/buquan">
         <file>api.txt</file>
+        <file>help.pdf</file>
     </qresource>
 </RCC>

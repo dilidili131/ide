@@ -7,7 +7,8 @@
 #include <qtextstream.h>
 #include <QPlainTextEdit>
 #include <QDebug>
-
+#include <QDesktopServices>
+//#include <QAxObject>
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -44,6 +45,10 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->action_Run,SIGNAL(triggered(bool)),this,SLOT(comp()));
     connect(ui->action_Run_2,SIGNAL(triggered(bool)),this,SLOT(run()));
     connect(ui->plainTextEdit,SIGNAL(textChanged()),this,SLOT(on_changed()));//当文本内容发生变化时，触发on_changed函数
+
+    //---------------------------帮助部分-----------------------------------
+    connect(ui->action_About,SIGNAL(triggered(bool)),this,SLOT(about()));
+    connect(ui->action_Description,SIGNAL(triggered(bool)),this,SLOT(description()));
 
     //关闭分页
     connect(codeeditor->tabWidget,SIGNAL(tabCloseRequested(int)),this,SLOT(removeSubTab(int)));
@@ -176,10 +181,6 @@ void MainWindow::saveFile(bool flag)
 }
 
 //-------另存为------------
-//1.获取文件名
-//2.判断文件名是否为空
-//3.保存过程同上
-//--------LCH------------
 void MainWindow::saveAsFile()
 {
     int index = codeeditor->tabWidget->currentIndex();
@@ -489,11 +490,34 @@ void MainWindow::removeSubTab(int index)//关闭分页
     }
     File[index].clear();
 }
+//关于我们
+void MainWindow::about()
+{
+    QMessageBox msg(NULL);
+    msg.setWindowTitle("关于我们");
+    msg.setText("                   \"打麻将吗\"开发团队\n"
+                "组长：石唯妍   班级：08111705   学号：1120172976\n"
+                "组员：杨思云   班级：08111705   学号：1120172981\n"
+                "组员：任翔渝   班级：08111706   学号：1120173805\n"
+                "组员：徐靖垚   班级：08111706   学号：1120172142\n"
+                "组员：李传赫   班级：08111706   学号：1120172774\n");
+    msg.setStandardButtons(QMessageBox::Ok);
+    msg.setWindowFlags(Qt::WindowStaysOnTopHint);
+    msg.exec();
+}
+//说明文档
+void MainWindow::description()
+{
+    QString strDoc = ":/buquan/help.pdf";
+    QDesktopServices::openUrl(QUrl::fromLocalFile(strDoc));
+}
+//括号补全 XJY
 bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 {
     QWidget *widget = codeeditor->tabWidget->currentWidget();
     QList<QsciScintilla*> c = widget->findChildren<QsciScintilla *>();
     QsciScintilla *e = c.at(0);
+
     QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
     if(keyEvent->key()==40)e->insert(")");
     if(keyEvent->key()==91)e->insert("]");
@@ -501,6 +525,6 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
     if(keyEvent->key()==60)e->insert(">");
     if(keyEvent->key()==34)e->insert("\"");
     if(keyEvent->key()==39)e->insert("\'");
-    qDebug()<<"key:  "<<keyEvent->key()<<endl;
+    //qDebug()<<"key:  "<<keyEvent->key()<<endl;
     return QObject::eventFilter(obj, event);
 }

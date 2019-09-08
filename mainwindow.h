@@ -57,6 +57,7 @@ public slots:
     void cut();        //剪切
     void copy();       //复制
     void paste();      //粘贴
+    void Comment();    //注释
     void showReplace();//替换
     void showFind();   //查找
     void pushFindLetter(QString, bool, bool);
@@ -66,8 +67,10 @@ public slots:
     void comp();
     void run();
     void removeSubTab(int index);
-    //-------注释--------------
-    void Comment(); //注释
+    //----------帮助------------
+    void about();   //关于我们
+    void description();    //说名文档
+
 
 
 protected:

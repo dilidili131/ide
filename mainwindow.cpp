@@ -315,11 +315,11 @@ void MainWindow::comp()
     }
     if(str=="")
     {
-        codeeditor->getconsole()->setText("编译成功");
+        codeeditor->getconsole()->setPlainText("编译成功");
     }
     else
     {
-        codeeditor->getconsole()->setText(str);
+        codeeditor->getconsole()->setPlainText(str);
     }
 }
 

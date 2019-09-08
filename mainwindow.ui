@@ -24,6 +24,16 @@
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout">
+    <item row="2" column="0">
+     <widget class="QPlainTextEdit" name="plainTextEdit">
+      <property name="minimumSize">
+       <size>
+        <width>700</width>
+        <height>300</height>
+       </size>
+      </property>
+     </widget>
+    </item>
     <item row="3" column="0">
      <widget class="QPlainTextEdit" name="plainTextEdit_2">
       <property name="minimumSize">
@@ -40,16 +50,6 @@
       </property>
      </widget>
     </item>
-    <item row="2" column="0">
-     <widget class="QPlainTextEdit" name="plainTextEdit">
-      <property name="minimumSize">
-       <size>
-        <width>700</width>
-        <height>300</height>
-       </size>
-      </property>
-     </widget>
-    </item>
    </layout>
   </widget>
   <widget class="QMenuBar" name="menuBar">
@@ -58,7 +58,7 @@
      <x>0</x>
      <y>0</y>
      <width>730</width>
-     <height>22</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu">

@@ -193,6 +193,3 @@ void CodeEditor::keyPressEvent(QKeyEvent *event)
     }
     std::cout<<event->key()<<' '<<hang<<' '<<lie<<std::endl;
 }
-
-
-

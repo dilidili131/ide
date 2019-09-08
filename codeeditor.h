@@ -27,14 +27,13 @@ private:
 
     QsciScintilla *editor=new QsciScintilla(this);
     QPlainTextEdit *console = new QPlainTextEdit(this);
-    //QsciScintilla *console=new QsciScintilla(this);
 
 signals:
 
 public slots:
 
 protected:
-    void keyPressEvent(QKeyEvent *event) override;
+    //void keyPressEvent(QKeyEvent *event) override;
 };
 
 #endif // CODEEDITOR_H

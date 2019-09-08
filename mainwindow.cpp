@@ -230,9 +230,6 @@ void MainWindow::Comment()
             codeeditor->geteditor()->removeSelectedText();
         }
     }
-
-
-
 }
 
 //撤销
@@ -291,7 +288,6 @@ void MainWindow::precomp()//预编译
 //编译并运行按钮
 void MainWindow::comp()
 {
-    codeeditor->getconsole()->clear();
     saveFile(true);
     precomp();//自动以预编译
 
@@ -315,11 +311,19 @@ void MainWindow::comp()
     }
     if(str=="")
     {
-        codeeditor->getconsole()->setPlainText("编译成功");
+        QWidget *widget = codeeditor->tabWidget->currentWidget();
+        QList<QPlainTextEdit*> c = widget->findChildren<QPlainTextEdit *>();
+        QPlainTextEdit *e = c.at(0);
+        e->clear();
+        e->setPlainText("编译成功");
     }
     else
     {
-        codeeditor->getconsole()->setPlainText(str);
+        QWidget *widget = codeeditor->tabWidget->currentWidget();
+        QList<QPlainTextEdit*> c = widget->findChildren<QPlainTextEdit *>();
+        QPlainTextEdit *e = c.at(0);
+        e->clear();
+        e->setPlainText(str);
     }
 }
 

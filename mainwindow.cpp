@@ -48,6 +48,7 @@ MainWindow::MainWindow(QWidget *parent) :
     //关闭分页
     connect(codeeditor->tabWidget,SIGNAL(tabCloseRequested(int)),this,SLOT(removeSubTab(int)));
     //this->grabKeyboard();
+    codeeditor->installEventFilter(this);
 }
 
 MainWindow::~MainWindow()
@@ -487,4 +488,19 @@ void MainWindow::removeSubTab(int index)//关闭分页
         }
     }
     File[index].clear();
+}
+bool MainWindow::eventFilter(QObject *obj, QEvent *event)
+{
+    QWidget *widget = codeeditor->tabWidget->currentWidget();
+    QList<QsciScintilla*> c = widget->findChildren<QsciScintilla *>();
+    QsciScintilla *e = c.at(0);
+    QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+    if(keyEvent->key()==40)e->insert(")");
+    if(keyEvent->key()==91)e->insert("]");
+    if(keyEvent->key()==123)e->insert("}");
+    if(keyEvent->key()==60)e->insert(">");
+    if(keyEvent->key()==34)e->insert("\"");
+    if(keyEvent->key()==39)e->insert("\'");
+    qDebug()<<"key:  "<<keyEvent->key()<<endl;
+    return QObject::eventFilter(obj, event);
 }

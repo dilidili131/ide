@@ -70,6 +70,8 @@ public slots:
     void Comment(); //注释
 
 
+protected:
+    bool eventFilter(QObject *obj, QEvent *event);
 private slots:
 };
 

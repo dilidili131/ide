@@ -13,6 +13,14 @@
 CodeEditor::CodeEditor(QWidget *parent)
     : QWidget(parent)
 {
+    treeview = new QTreeView();
+    model =new  QDirModel;
+    treeview->setModel(model);
+    treeview->setRootIndex(model->index("c:\\"));
+    //treeview->setColumnWidth(0,100);
+    treeview->hideColumn(1);
+    treeview->hideColumn(2);
+    treeview->hideColumn(3);
 
     //行号提示
     editor->setMarginType(0,QsciScintilla::NumberMargin);//设置编号为0的页边显示行号。
@@ -20,16 +28,25 @@ CodeEditor::CodeEditor(QWidget *parent)
     editor->setMarginWidth(0,30);//设置页边宽度
 
     //界面
+    QHBoxLayout *hlayout = new  QHBoxLayout();
+    hlayout->setContentsMargins(0,0,0,0);
+    QVBoxLayout *vlayout1 = new QVBoxLayout();//目录
+    vlayout1->addWidget(treeview);
+    QVBoxLayout *vlayout2 = new QVBoxLayout();//code
+    vlayout2->addWidget(editor);
+    vlayout2->addWidget(console);
+    vlayout2->setStretchFactor(editor,4);
+    vlayout2->setStretchFactor(console,1);
+
+    hlayout->addLayout(vlayout1);
+    hlayout->addLayout(vlayout2);
+    hlayout->setStretchFactor(vlayout1,1);
+    hlayout->setStretchFactor(vlayout2,6);
+
     tabWidget = new QTabWidget();
-    QVBoxLayout *pLayout = new QVBoxLayout();
     QWidget *widget1 = new QWidget();
-    pLayout->addWidget(editor);
-    pLayout->addWidget(console);
-    pLayout->setContentsMargins(0,0,0,0);
-    pLayout->setStretchFactor(editor, 4);
-    pLayout->setStretchFactor(console, 1);
-    widget1->setLayout(pLayout);
-    //const char *s = fileName.toStdString().data();
+    widget1->setLayout(hlayout);
+
     tabWidget->addTab(widget1,"untitled.cpp");
 
     tabWidget->setTabsClosable(true);//添加关闭按钮
@@ -80,12 +97,18 @@ CodeEditor::CodeEditor(QWidget *parent)
 
     //括号匹配
     editor->setBraceMatching(QsciScintilla::SloppyBraceMatch);
-    //this->grabKeyboard();
+
 
     //代码折叠
-    editor->setMarginType(3,QsciScintilla::SymbolMargin);
-    editor->setMarginLineNumbers(3,false);
-    editor->setMarginWidth(3,15);
-    editor->setMarginSensitivity(3,true);
+    //    editor->setMarginType(3,QsciScintilla::SymbolMargin);
+    //    editor->setMarginLineNumbers(3,false);
+    //    editor->setMarginWidth(3,15);
+    //    editor->setMarginSensitivity(3,true);
     editor->setFolding(QsciScintilla::BoxedTreeFoldStyle,3);
+
+
 }
+
+
+
+

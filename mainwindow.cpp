@@ -8,6 +8,7 @@
 #include <QPlainTextEdit>
 #include <QDebug>
 #include <QDesktopServices>
+#include <bits/concept_check.h>
 //#include <QAxObject>
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -24,6 +25,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->action_Open,SIGNAL(triggered(bool)),this,SLOT(openFile()));
     connect(ui->action_Save,SIGNAL(triggered(bool)),this,SLOT(saveFile(bool)));
     connect(ui->action_SaveAs,SIGNAL(triggered(bool)),this,SLOT(saveAsFile()));
+    connect(codeeditor->treeview,SIGNAL(doubleClicked(const QModelIndex& )),this,SLOT(treeOpenFile(QModelIndex)));
 
     //---------------------------编辑部分----------------------------------
     connect(ui->action_Undo,SIGNAL(triggered(bool)),this,SLOT(undo()));
@@ -35,6 +37,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->action_zhushi,SIGNAL(triggered(bool)),this,SLOT(Comment()));
     connect(ui->action_Find,SIGNAL(triggered(bool)),this,SLOT(showFind()));
     connect(ui->action_Replace,SIGNAL(triggered(bool)),this,SLOT(showReplace()));
+    //connect(ui->action_Annotation,SIGNAL(triggered(bool)),this,SLOT(AnnotationHiden()));
 
     connect(&find,SIGNAL(findLetter(QString,bool,bool)),this,SLOT(pushFindLetter(QString,bool,bool)));
     //connect(&find,SIGNAL(findLetter(QString,bool,bool)),this,SLOT(pushFindLetter(QString,bool,bool)));
@@ -54,6 +57,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(codeeditor->tabWidget,SIGNAL(tabCloseRequested(int)),this,SLOT(removeSubTab(int)));
     //this->grabKeyboard();
     codeeditor->installEventFilter(this);
+
+
+
 }
 
 MainWindow::~MainWindow()
@@ -64,11 +70,9 @@ MainWindow::~MainWindow()
 //初始化文件信息
 void MainWindow::initFileData()
 {
+    setWindowTitle("Untitled.cpp");
     fileName=tr("Untitled.cpp");
-    isSaved=false;
-    isRunning=false;
 }
-
 //--------新建文件----------
 //1.新建主窗口对象
 //2.确定新窗口位置
@@ -78,23 +82,32 @@ void MainWindow::newFile()
 {
     qDebug()<<"新建";
     QWidget *widget = new QWidget();
-    QVBoxLayout *v = new QVBoxLayout();
+    QHBoxLayout *h  = new QHBoxLayout();
+    h->setContentsMargins(0,0,0,0);
+    QVBoxLayout *v1 = new QVBoxLayout();
+    QVBoxLayout *v2 = new QVBoxLayout();
     CodeEditor c;
-    v->addWidget(c.geteditor());
-    v->addWidget(c.getconsole());
-    v->setContentsMargins(0,0,0,0);
-    v->setStretchFactor(c.geteditor(), 4);
-    v->setStretchFactor(c.getconsole(), 1);
-    widget->setLayout(v);
+    v1->addWidget(c.treeview);
+    v2->addWidget(c.geteditor());
+    v2->addWidget(c.getconsole());
+    v2->setStretchFactor(c.geteditor(), 4);
+    v2->setStretchFactor(c.getconsole(), 1);
+    h->addLayout(v1);
+    h->addLayout(v2);
+    h->setStretchFactor(v1,1);
+    h->setStretchFactor(v2,5);
+    widget->setLayout(h);
     codeeditor->tabWidget->addTab(widget,"untitled.cpp");
+
     codeeditor->tabWidget->setCurrentWidget(widget);
+    connect(c.treeview,SIGNAL(doubleClicked(const QModelIndex& )),this,SLOT(treeOpenFile(QModelIndex)));
 }
 
 //-------------打开文件-------------------
 void MainWindow::openFile()
 {
     //重写的打开文件
-    QString path = QFileDialog::getOpenFileName(this,tr("打开文件"),".",tr("C++ source Files(*.cpp *.c *.h)"));
+    path = QFileDialog::getOpenFileName(this,tr("打开文件"),".",tr("C++ source Files(*.cpp *.c *.h)"));
     if(!path.isEmpty())
     {
         QFile file(path);
@@ -102,7 +115,6 @@ void MainWindow::openFile()
             QMessageBox::warning(this,tr("错误"),tr("打开文件失败"));
             return ;
         }
-
         int index = codeeditor->tabWidget->currentIndex();
         QRegularExpression re(tr("(?<=\\/)\\w+\\.cpp|(?<=\\/)\\w+\\.c|(?<=\\/)\\w+\\.h"));
         File[index] = re.match(path).captured();
@@ -128,7 +140,7 @@ void MainWindow::saveFile(bool flag)
     //该窗口第一次保存
     if(File[index].isEmpty())
     {
-        QString path = QFileDialog::getSaveFileName(this,tr("Open File"),fileName,tr("C++ Source File(*.cpp *.c *.h)"));
+        path = QFileDialog::getSaveFileName(this,tr("Open File"),fileName,tr("C++ Source File(*.cpp *.c *.h)"));
         if(!path.isEmpty())//选择好了路径
         {
             QFile file(path);
@@ -184,7 +196,7 @@ void MainWindow::saveFile(bool flag)
 void MainWindow::saveAsFile()
 {
     int index = codeeditor->tabWidget->currentIndex();
-    QString path = QFileDialog::getSaveFileName(this,tr("Open File"),fileName,tr("C++ Source File(*.cpp *.c *.h)"));
+    path = QFileDialog::getSaveFileName(this,tr("Open File"),fileName,tr("C++ Source File(*.cpp *.c *.h)"));
     if(!path.isEmpty())//选择好了路径
     {
         QFile file(path);
@@ -213,17 +225,50 @@ void MainWindow::saveAsFile()
     }
 }
 
+void MainWindow::treeOpenFile(QModelIndex index)
+{
+    QWidget *widget = codeeditor->tabWidget->currentWidget();
+    QList<QsciScintilla*> c = widget->findChildren<QsciScintilla *>();
+    QsciScintilla *e = c.at(0);
+
+    QString filePath = "";
+    filePath = QString(index.data().toString())+filePath;
+    while(index.parent().data().toString()!=""){
+        index = index.parent();
+        filePath = QString(index.data().toString())+QString("/")+filePath;
+    }
+    qDebug()<<path;
+    QFile file(filePath);
+    if (!file.open(QFile::ReadOnly)) {
+        QMessageBox::warning(this, tr("Application"),
+                             tr("Cannot read file %1:\n%2.")
+                             .arg(filePath)
+                             .arg(file.errorString()));
+        return;
+    }
+
+    QTextStream File_in(&file);
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+    e->setText(File_in.readAll());
+    QApplication::restoreOverrideCursor();
+
+    //setCurrentFileName(fileName);
+    statusBar()->showMessage(tr("File loaded"), 2000);
+
+
+}
+
 //多行注释
 void MainWindow::Comment()
 {
-    qDebug()<<"注释";
+    //qDebug()<<"注释";
 
     QWidget *widget = codeeditor->tabWidget->currentWidget();
     QList<QsciScintilla*> c = widget->findChildren<QsciScintilla *>();
     QsciScintilla *e = c.at(0);
 
     e->getSelection(&from,&start,&to,&end);
-    qDebug()<<from<<"+"<<to<<"+"<<start<<"+"<<end<<endl;
+    //qDebug()<<from<<"+"<<to<<"+"<<start<<"+"<<end<<endl;
     if(from>to){
         temp=from;
         from=to;
@@ -294,6 +339,16 @@ void MainWindow::showFind()
     qDebug()<<"查找界面出现";
     find.show();
 }
+////注释隐藏
+//void MainWindow::AnnotationHiden()
+//{
+//    QWidget *widget = codeeditor->tabWidget->currentWidget();
+//    QList<QsciScintilla*> c = widget->findChildren<QsciScintilla *>();
+//    QsciScintilla *e = c.at(0);
+
+//    e->setAnnotationDisplay(QsciScintilla::AnnotationHidden);
+//    qDebug()<<"隐藏";
+//}
 
 void MainWindow::pushFindLetter(QString letter, bool match, bool forward)
 {
@@ -309,7 +364,7 @@ void MainWindow::pushFindLetter(QString letter, bool match, bool forward)
         msg.setIcon(QMessageBox::Information);
         msg.setStandardButtons(QMessageBox::Ok);
 
-        msg.setWindowFlags(Qt::WindowStaysOnBottomHint);
+        msg.setWindowFlags(Qt::WindowStaysOnTopHint);
         msg.exec();
     }
 }
@@ -340,7 +395,6 @@ void MainWindow::pushReplaceSelect(QString letter, QString replaceTo, bool match
         msg.exec();
     }
 }
-//BUG 编译部分有个bug，把文件放到build-IDE文件夹里才能编译
 
 void MainWindow::precomp()//预编译
 {
@@ -508,7 +562,7 @@ void MainWindow::about()
 //说明文档
 void MainWindow::description()
 {
-   QDesktopServices::openUrl(QUrl("https://blog.csdn.net/qq_40619550/article/details/90760116"));
+    QDesktopServices::openUrl(QUrl("https://blog.csdn.net/qq_40619550/article/details/90760116"));
 }
 //括号补全 XJY
 bool MainWindow::eventFilter(QObject *obj, QEvent *event)

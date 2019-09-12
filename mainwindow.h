@@ -5,7 +5,7 @@
 #include <qtextedit.h>
 #include "codeeditor.h"
 #include "find.h"
-
+#include "tree.h"
 namespace Ui {
 class MainWindow;
 }
@@ -22,14 +22,14 @@ private:
     Ui::MainWindow *ui;
 
     CodeEditor *codeeditor = new CodeEditor(this);
-    CodeEditor *C[1024];
 
     QString fileName;
     QString File[1024];
-    bool isSaved;
-    bool isRunning;
-    bool Flag_isOpen = false;       //标记：判断是否打开或创建了一个文件
-    bool Flag_isNew = true;        //教训：初始为true，次应用而为C语言ide，打开不用判断文件是否新建，可直接写代码
+    QString path;
+    //bool isSaved;
+    //bool isRunning;
+    //bool Flag_isOpen = false;       //标记：判断是否打开或创建了一个文件
+    //bool Flag_isNew = true;       //教训：初始为true，次应用而为C语言ide，打开不用判断文件是否新建，可直接写代码
 
     void initFileData();//初始化文件信息
     void precomp();//预编译
@@ -40,7 +40,8 @@ private:
     int temp;
     int start;
     int end;
-    Find find;
+    Find find;//查找
+
 
     //槽函数链接
 public slots:
@@ -49,6 +50,7 @@ public slots:
     void openFile();   //打开文件
     void saveFile(bool flag);   //保存文件
     void saveAsFile(); //另存为
+    void treeOpenFile(QModelIndex);
 
     //----------编辑部分---------
     void undo();       //撤销
@@ -60,6 +62,7 @@ public slots:
     void Comment();    //注释
     void showReplace();//替换
     void showFind();   //查找
+    //void AnnotationHiden(); //注释隐藏
     void pushFindLetter(QString, bool, bool);
     void pushReplaceSelect(QString, QString, bool, bool, bool);
 

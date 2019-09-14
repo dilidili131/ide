@@ -58,7 +58,7 @@
      <x>0</x>
      <y>0</y>
      <width>730</width>
-     <height>22</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu">
@@ -98,6 +98,7 @@
     </property>
     <addaction name="action_Run"/>
     <addaction name="action_Run_2"/>
+    <addaction name="action_Compile"/>
    </widget>
    <addaction name="menu"/>
    <addaction name="menu_2"/>
@@ -331,6 +332,11 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+H</string>
+   </property>
+  </action>
+  <action name="action_Compile">
+   <property name="text">
+    <string>调试</string>
    </property>
   </action>
  </widget>

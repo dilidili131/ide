@@ -50,6 +50,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->action_Run,SIGNAL(triggered(bool)),this,SLOT(comp()));
     connect(ui->action_Run_2,SIGNAL(triggered(bool)),this,SLOT(run()));
     connect(ui->plainTextEdit,SIGNAL(textChanged()),this,SLOT(on_changed()));//当文本内容发生变化时，触发on_changed函数
+    connect(ui->action_Compile,SIGNAL(triggered(bool)),this,SLOT(pushDebug()));//debug
 
     //---------------------------帮助部分-----------------------------------
     connect(ui->action_About,SIGNAL(triggered(bool)),this,SLOT(about()));
@@ -504,6 +505,22 @@ void MainWindow::annotate_hide_and_show()
 
 }
 
+//一次调试一个文件
+void MainWindow::pushDebug()
+{
+    int index = codeeditor->tabWidget->currentIndex();
+    QString FileName = File[index];
+    for(int i = 1; i <= codeeditor->geteditor()->lines(); i++)
+    {
+        if(codeeditor->geteditor()->markersAtLine(i) != 0)
+        {
+            debug.breaks.push_back(i);
+        }
+    }
+    debug.fname = FileName;
+    debug.show();
+}
+
 void MainWindow::precomp()//预编译
 {
     int index = codeeditor->tabWidget->currentIndex();
@@ -529,17 +546,18 @@ void MainWindow::precomp()//预编译
 void MainWindow::comp()
 {
     saveFile(true);
-    precomp();//自动以预编译
+    //precomp();//自动以预编译
 
     int index = codeeditor->tabWidget->currentIndex();
     QString FileName = File[index];
-    const char *s = FileName.toStdString().data();
+
+    QStringList list = FileName.split(".");
+    const char *n = FileName.toStdString().data();
+    const char *s = list[0].toStdString().data();
     QString cmd;
-    cmd.sprintf("gcc -o %s.exe %s.c 2> err.txt",s,s);
+    cmd.sprintf("gcc -o %s.exe %s 2> err.txt",s,n);
     system(cmd.toStdString().data());//先编译
 
-    cmd = FileName.replace("/","\\") + ".c";
-    remove(cmd.toStdString().data());
 
     FILE *f = fopen("err.txt","r");
     QString str = "";
@@ -571,8 +589,11 @@ void MainWindow::run()
 {
     int index = codeeditor->tabWidget->currentIndex();
     QString FileName = File[index];
+
+    QStringList list = FileName.split(".");
+    const char *s = list[0].toStdString().data();
     QString cmd;
-    cmd = FileName + ".exe";
+    cmd.sprintf("%s.exe",s);
     system(cmd.toStdString().data());
 
     remove(cmd.toStdString().data());

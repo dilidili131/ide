@@ -5,7 +5,8 @@
 #include <qtextedit.h>
 #include "codeeditor.h"
 #include "find.h"
-#include "tree.h"
+#include "debug.h"
+//#include "tree.h"
 namespace Ui {
 class MainWindow;
 }
@@ -38,6 +39,9 @@ private:
     int start;
     int end;
     Find find;//查找
+
+    Debug debug;
+
     //用于注释隐藏
     bool isAnnotationHide;
     struct antt{
@@ -79,6 +83,7 @@ public slots:
     void comp();
     void run();
     void removeSubTab(int index);
+    void pushDebug();
     //----------帮助------------
     void about();   //关于我们
     void description();    //说名文档

@@ -1,7 +1,7 @@
 #ifndef CODEEDITOR_H
 #define CODEEDITOR_H
 
-#include "tree.h"
+//#include "tree.h"
 
 #include <QWidget>
 #include <Qsci/qsciscintilla.h>
@@ -12,6 +12,8 @@
 #include <QPlainTextEdit>
 #include <QTabWidget>
 #include <QTreeView>
+#include <QSplitter>
+#include <QDirModel>
 class CodeEditor : public QWidget
 {
     Q_OBJECT
@@ -40,7 +42,8 @@ private:
 signals:
 
 
-public slots:
+private slots:
+    void on_margin_clicked(int, int, Qt::KeyboardModifiers);
 
 protected:
     //void keyPressEvent(QKeyEvent *event) override;

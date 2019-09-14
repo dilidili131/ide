@@ -106,7 +106,30 @@ CodeEditor::CodeEditor(QWidget *parent)
     //    editor->setMarginSensitivity(3,true);
     editor->setFolding(QsciScintilla::BoxedTreeFoldStyle,3);
 
+    //断点设置
+    editor->setMarginType(1, QsciScintilla::SymbolMargin);
+    editor->setMarginLineNumbers(1, false);
+    editor->setMarginSensitivity(1,true);
+    connect(editor, SIGNAL(marginClicked(int, int, Qt::KeyboardModifiers)),this,
+            SLOT(on_margin_clicked(int, int, Qt::KeyboardModifiers)));
 
+    editor->markerDefine(QsciScintilla::Circle, 1);
+    editor->setMarkerBackgroundColor(QColor("#ee1111"), 1);
+
+}
+//有bug，新建页面不能添加断点
+//换行marker会跑
+void CodeEditor::on_margin_clicked(int margin, int line, Qt::KeyboardModifiers)
+{
+    qDebug("%d %d",margin,line);
+    if (margin == 1) {
+            if (editor->markersAtLine(line) != 0) {
+                editor->markerDelete(line, 1);
+            }
+            else {
+                editor->markerAdd(line, 1);
+            }
+        }
 }
 
 

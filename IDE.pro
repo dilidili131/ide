@@ -28,16 +28,19 @@ SOURCES += \
         main.cpp \
         mainwindow.cpp \
     codeeditor.cpp \
-    find.cpp
+    find.cpp \
+    debug.cpp
 
 HEADERS += \
         mainwindow.h \
     codeeditor.h \
-    find.h
+    find.h \
+    debug.h
 
 FORMS += \
         mainwindow.ui \
-    find.ui
+    find.ui \
+    debug.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

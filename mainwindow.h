@@ -26,10 +26,7 @@ private:
     QString fileName;
     QString File[1024];
     QString path;
-    //bool isSaved;
-    //bool isRunning;
-    //bool Flag_isOpen = false;       //标记：判断是否打开或创建了一个文件
-    //bool Flag_isNew = true;       //教训：初始为true，次应用而为C语言ide，打开不用判断文件是否新建，可直接写代码
+
 
     void initFileData();//初始化文件信息
     void precomp();//预编译
@@ -41,6 +38,14 @@ private:
     int start;
     int end;
     Find find;//查找
+    //用于注释隐藏
+    bool isAnnotationHide;
+    struct antt{
+        int pos;
+        QString an;
+    };
+    std::vector<antt> annotate;
+
 
 
     //槽函数链接
@@ -65,6 +70,10 @@ public slots:
     //void AnnotationHiden(); //注释隐藏
     void pushFindLetter(QString, bool, bool);
     void pushReplaceSelect(QString, QString, bool, bool, bool);
+
+    void recordPos();//记录位置
+    void annotate_hide_and_show();//槽函数
+
 
     //---------编译部分----------
     void comp();

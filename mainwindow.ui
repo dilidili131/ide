@@ -83,6 +83,7 @@
     <addaction name="action_zhushi"/>
     <addaction name="action_Find"/>
     <addaction name="action_Replace"/>
+    <addaction name="action_Annotation"/>
    </widget>
    <widget class="QMenu" name="menu_3">
     <property name="title">
@@ -318,6 +319,11 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+R</string>
+   </property>
+  </action>
+  <action name="action_Annotation">
+   <property name="text">
+    <string>隐藏</string>
    </property>
   </action>
  </widget>

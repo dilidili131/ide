@@ -18,5 +18,6 @@
         <file>image/find.png</file>
         <file>image/replace.png</file>
         <file>image/bianyi.png</file>
+        <file>image/hide.png</file>
     </qresource>
 </RCC>

@@ -322,8 +322,15 @@
    </property>
   </action>
   <action name="action_Annotation">
+   <property name="icon">
+    <iconset resource="myresources.qrc">
+     <normaloff>:/myImages/image/hide.png</normaloff>:/myImages/image/hide.png</iconset>
+   </property>
    <property name="text">
-    <string>隐藏</string>
+    <string>隐藏(&amp;H)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+H</string>
    </property>
   </action>
  </widget>

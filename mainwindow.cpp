@@ -103,6 +103,7 @@ void MainWindow::newFile()
 
     codeeditor->tabWidget->setCurrentWidget(widget);
     connect(c.treeview,SIGNAL(doubleClicked(const QModelIndex& )),this,SLOT(treeOpenFile(QModelIndex)));
+    connect(c.geteditor(),SIGNAL(textChanged()),this,SLOT(recordPos()));
 }
 
 //-------------打开文件-------------------
@@ -391,10 +392,14 @@ void MainWindow::pushReplaceSelect(QString letter, QString replaceTo, bool match
 //记录位置
 void MainWindow::recordPos()
 {
+    QWidget *widget = codeeditor->tabWidget->currentWidget();
+    QList<QsciScintilla*> c = widget->findChildren<QsciScintilla *>();
+    QsciScintilla *e = c.at(0);
+
     if(isAnnotationHide){
         int line,index;
-        codeeditor->geteditor()->getCursorPosition(&line,&index);
-        int pos = codeeditor->geteditor()->positionFromLineIndex(line,index);//作为字符串的位置（一维）
+        e->getCursorPosition(&line,&index);
+        int pos = e->positionFromLineIndex(line,index);//作为字符串的位置（一维）
         if(!annotate.empty()) {
             for(int i=0;i<annotate.size();i++){
                 if(pos < annotate[i].pos)
@@ -406,19 +411,23 @@ void MainWindow::recordPos()
 //注释隐藏与否
 void MainWindow::annotate_hide_and_show()
 {
+    QWidget *widget = codeeditor->tabWidget->currentWidget();
+    QList<QsciScintilla*> c = widget->findChildren<QsciScintilla *>();
+    QsciScintilla *e = c.at(0);
+
     if(!isAnnotationHide){//隐藏
         int line = 0, index = 0, vectorSize = 0;
-        QString text = codeeditor->geteditor()->text();
+        QString text = e->text();
         antt temp;
 
         QRegExp re_several("/\\*((?!\\*/).)*\\*/"), re_single("//[^\\n\\r]*");
-        text = codeeditor->geteditor()->text();
+        text = e->text();
         int pos_several = text.indexOf(re_several), pos_single = text.indexOf(re_single);
         while (pos_several >= 0 || pos_single >= 0) {
             if (pos_several != -1 && (pos_several < pos_single || pos_single == -1)) {
-                codeeditor->geteditor()->lineIndexFromPosition(pos_several, &line, &index);
+                e->lineIndexFromPosition(pos_several, &line, &index);
                 int lineto, indexto;
-                codeeditor->geteditor()->lineIndexFromPosition(pos_several + re_several.matchedLength(), &lineto, &indexto);
+                e->lineIndexFromPosition(pos_several + re_several.matchedLength(), &lineto, &indexto);
                 temp.pos = pos_several; temp.an = re_several.cap(0);
                 if (lineto != line)
                     indexto += 2;
@@ -427,45 +436,45 @@ void MainWindow::annotate_hide_and_show()
                 //                qDebug() << "pos:" << pos_several;
                 //                qDebug() << "delete annotate:" << annotate[vectorSize - 1].an;
 
-                codeeditor->geteditor()->setSelection(line, index, lineto, indexto);
-                codeeditor->geteditor()->removeSelectedText();
+                e->setSelection(line, index, lineto, indexto);
+                e->removeSelectedText();
 
-                QString textLine = codeeditor->geteditor()->text(line);
+                QString textLine = e->text(line);
                 if (textLine.indexOf(QRegExp("^[\\n\\r]$")) != -1) {
                     //只要有用户输入的不在注释范围内的空白字符那么就不会删除这一行。
                     //换行符除非与/**/的结尾连在一起，不然也不会删除
                     annotate[vectorSize - 1].pos;
                     annotate[vectorSize - 1].an.append("\n");
-                    codeeditor->geteditor()->setSelection(line, 0, line, 1);
-                    codeeditor->geteditor()->removeSelectedText();
+                    e->setSelection(line, 0, line, 1);
+                    e->removeSelectedText();
                 }
 
-                text = codeeditor->geteditor()->text();
+                text = e->text();
                 pos_single = text.indexOf(re_single, pos_several);
                 pos_several = text.indexOf(re_several, pos_several);
             }
 
             if (pos_single != -1 && (pos_several > pos_single || pos_several == -1)) {
                 qDebug() << re_single.capturedTexts();
-                codeeditor->geteditor()->lineIndexFromPosition(pos_single, &line, &index);//获取行列
+                e->lineIndexFromPosition(pos_single, &line, &index);//获取行列
                 //把注释放到vector变量里
                 temp.pos = pos_single; temp.an = re_single.cap(0); annotate.push_back(temp); vectorSize++;
                 qDebug() << "delete annotate:" << annotate[vectorSize - 1].an;
                 qDebug() << "pos:" << pos_single;
                 qDebug() << "vector pos:" << annotate[vectorSize - 1].pos;
-                codeeditor->geteditor()->setSelection(line, index, line, index + re_single.cap(0).size());
-                codeeditor->geteditor()->removeSelectedText();//选定删除（没有找到删除函数，但是剪切一样可以)
-                QString textLine = codeeditor->geteditor()->text(line);
+                e->setSelection(line, index, line, index + re_single.cap(0).size());
+                e->removeSelectedText();//选定删除（没有找到删除函数，但是剪切一样可以)
+                QString textLine = e->text(line);
 
                 if (textLine.indexOf(QRegExp("^[\\n\\r]$")) != -1) {
                     //只要有用户输入的不在注释范围内的空白字符那么就不会删除这一行。
                     //换行符除非与/**/的结尾连在一起，不然也不会删除
                     annotate[vectorSize - 1].an += "\n";
-                    codeeditor->geteditor()->setSelection(line, 0, line, 1);
-                    codeeditor->geteditor()->removeSelectedText();
+                    e->setSelection(line, 0, line, 1);
+                    e->removeSelectedText();
                 }
 
-                text = codeeditor->geteditor()->text();//重新获取删除后的文本
+                text = e->text();//重新获取删除后的文本
                 //qDebug() << "text:" << text;
                 pos_several = text.indexOf(re_several, pos_single);
                 pos_single = text.indexOf(re_single, pos_single);//继续查找
@@ -484,8 +493,8 @@ void MainWindow::annotate_hide_and_show()
         if (!annotate.empty()) {
             int line, index;
             for (int i = annotate.size() - 1; i >= 0; i--) {
-                codeeditor->geteditor()->lineIndexFromPosition(annotate[i].pos, &line, &index);
-                codeeditor->geteditor()->insertAt(annotate[i].an, line, index);
+                e->lineIndexFromPosition(annotate[i].pos, &line, &index);
+                e->insertAt(annotate[i].an, line, index);
             }
         }
         annotate.clear();
